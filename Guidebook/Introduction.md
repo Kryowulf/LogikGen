@@ -49,7 +49,7 @@ The original Zebra puzzle appeared in *Life International* magazine, reproduced 
 
 These puzzles are traditionally solved using a grid like the one below:
 
-![Zebra Puzzle Blank Grid](ZebraBigBlank.png)  
+![Zebra Puzzle Blank Grid](Files/ZebraBigBlank.png)  
 **Figure 1 - Blank Zebra Grid**
 
 To mark that two items are disassociated - for example, that the fox doesn't live in the same house as where Chesterfields are smoked - we place an `x` in the corresponding rows & columns. 
@@ -58,12 +58,12 @@ To mark that two items are associated - for example, that the Englishman lives i
 
 The resulting grid is shown below:
 
-![Zebra Puzzle Partial Grid](ZebraBigPartial.png)  
+![Zebra Puzzle Partial Grid](Files/ZebraBigPartial.png)  
 **Figure 2 - A Few Facts Recorded**
 
 The puzzle is completed when every cell of the grid is filled:
 
-![Zebra Puzzle Filled Grid](ZebraBigFilled.png)  
+![Zebra Puzzle Filled Grid](Files/ZebraBigFilled.png)  
 **Figure 3 - Completed Zebra Grid**
 
 Final Solution:
@@ -85,27 +85,27 @@ To generate a basic puzzle, follow the steps below:
 
 Select the desired size of your puzzle and type in all of its categories and properties. Any categories marked "Is Ordered" will have `LessThan` and `NextTo` constraints generated for them (e.g, *"The Norwegian lives next to the blue house"*).
 
-![Puzzle Definition Window](DefinitionWindow.png)  
+![Puzzle Definition Window](Files/DefinitionWindow.png)  
 **Figure 4 - Define Your Puzzle**
 
 ### Step 2
 
 Select the desired final solution of the puzzle, or pick a randomized solution. 
 
-![Puzzle Solution Window](SolutionWindow.png)  
+![Puzzle Solution Window](Files/SolutionWindow.png)  
 **Figure 5 - Enter the Desired Solution**
 
 ### Step 3
 
 There are many available settings, the details of which can be reviewed in the [Generation Settings](GenerationSettings.md) and [Strategies](Strategies.md) guides. For now, just click the "Generate" button, wait ten seconds, then click the "Cancel" button. The program will continually search for better & more difficult puzzles the longer you keep it running.
 
-![Generation Window](GenerationWindow.png)  
+![Generation Window](Files/GenerationWindow.png)  
 **Figure 6 - Puzzle Generation Settings**
 
-![Generation Window Searching](GenerationWindowSearching.png)  
+![Generation Window Searching](Files/GenerationWindowSearching.png)  
 **Figure 7 - The Generator is Running**
 
-![Generation Window Done](GenerationWindowDone.png)
+![Generation Window Done](Files/GenerationWindowDone.png)
 **Figure 8 - Puzzle Generation Complete**
 
 *LogikGen* will, by default, use all available cores of your CPU to search for good puzzles. It accomplishes this by launching several threads which run in parallel, the progress of which can be seen on the sidebar to the right. 

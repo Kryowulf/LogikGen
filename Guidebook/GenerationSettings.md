@@ -24,7 +24,7 @@ The longer you leave *LogikGen* running, the more challenging the resulting puzz
 
 The purpose of each setting is discussed below. 
 
-![Generation Window](GenerationWindow.png)
+![Generation Window](Files/GenerationWindow.png)
 
 ## Heading
 
@@ -84,7 +84,7 @@ Leave these settings blank if you do not care to enforce any particular maximum.
 
 ## Interpreting the Output
 
-[Sample Output](SampleOutput.txt)
+[Sample Output](Files/SampleOutput.txt)
 
 #### Satisfied vs. Unsatisfied
 
