@@ -1,23 +1,17 @@
 ﻿using LogikGenAPI.Generation;
 using LogikGenAPI.Model.Constraints;
 using LogikGenAPI.Resolution;
-using LogikGenAPI.Resolution.Strategies;
 using LogikGenAPI.Utilities;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using System.Windows.Threading;
 using WPFUI.ViewModels;
 
 namespace WPFUI
@@ -27,7 +21,6 @@ namespace WPFUI
         private GenerationWindowViewModel _viewmodel;
         private CancellationTokenSource _cts;
         private bool _isRunning;
-        private List<int> _totalPuzzlesSearchedByTaskId;
 
         public GenerationWindow(SolutionGrid solution, double left = -1, double top = -1)
         {
@@ -36,7 +29,6 @@ namespace WPFUI
             _viewmodel = new GenerationWindowViewModel(solution);
             _cts = null;
             _isRunning = false;
-            _totalPuzzlesSearchedByTaskId = new List<int>();
 
             this.DataContext = _viewmodel;
 
@@ -65,15 +57,15 @@ namespace WPFUI
 
                 int unsolvableDepth = _viewmodel.UnsolvableDepth ?? -1;
                 int seed = _viewmodel.Seed ?? -1;
-                int nthreads = _viewmodel.NThreads ?? -1;
+                int nthreads = _viewmodel.NThreads ?? Environment.ProcessorCount;
+                GenerationStatusUpdater updater = new GenerationStatusUpdater(nthreads, this.Dispatcher, searchProgressCallback);
 
                 try
                 {
                     if (_viewmodel.IsGenerateUnsolvableChecked)
                     {
                         IList<Constraint> constraints = await Task.Run(() => mpgen.FindUnsolvablePuzzle(
-                            (taskId, puzzlesSearched) => this.Dispatcher.BeginInvoke(new Action<int, int>(statusUpdate), taskId, puzzlesSearched),
-                            _cts.Token, unsolvableDepth, seed, nthreads));
+                            updater.UpdateSearchProgress, _cts.Token, unsolvableDepth, seed, nthreads));
 
                         if (constraints == null)
                         {
@@ -99,11 +91,10 @@ namespace WPFUI
                     else
                     {
                         AnalysisReport finalReport = await Task.Run(() => mpgen.FindSatisfyingPuzzle(
-                            (report) => this.Dispatcher.BeginInvoke(new Action<PuzzleGenerator, AnalysisReport>(newPuzzleFound), pgen, report),
-                            (taskId, puzzlesSearched) => this.Dispatcher.BeginInvoke(new Action<int, int>(statusUpdate), taskId, puzzlesSearched),
-                            _cts.Token, seed, nthreads));
+                            (report) => this.Dispatcher.BeginInvoke(new Action<PuzzleGenerator, AnalysisReport>(newPuzzleCallback), pgen, report),
+                            updater.UpdateSearchProgress, _cts.Token, seed, nthreads));
 
-                        newPuzzleFound(pgen, finalReport);
+                        newPuzzleCallback(pgen, finalReport);
 
                         PuzzleSolver solver = new PuzzleSolver(pgen.PropertySet, pgen.Strategies);
                         solver.AddConstraints(finalReport.Constraints);
@@ -117,7 +108,7 @@ namespace WPFUI
                 }
                 catch(Exception ex)
                 {
-                    outputTextbox.Text = ex.Message;
+                    outputTextbox.Text = ex.Message + "\n" + ex.StackTrace;
                     _cts.Cancel();
                 }
 
@@ -136,24 +127,22 @@ namespace WPFUI
             _cts?.Cancel();
         }
 
-        private void newPuzzleFound(PuzzleGenerator pgen, AnalysisReport report)
+        private void newPuzzleCallback(PuzzleGenerator pgen, AnalysisReport report)
         {
             string heading = pgen.SatisfiesTargets(report) ? "[SATISFIED]" : "[UNSATISFIED]";
             outputTextbox.Text = heading + "\n" + report.Print();
         }
 
-        private void statusUpdate(int taskId, int puzzlesSearched)
+        private void searchProgressCallback(int[] progress)
         {
-            while (taskId >= threadStatusPanel.Children.Count)
-            {
+            while (progress.Length > threadStatusPanel.Children.Count)
                 threadStatusPanel.Children.Add(new TextBlock());
-                _totalPuzzlesSearchedByTaskId.Add(0);
-            }
 
-            _totalPuzzlesSearchedByTaskId[taskId] = puzzlesSearched;
-            int sum = _totalPuzzlesSearchedByTaskId.Sum();
+            int sum = progress.Sum();
 
-            (threadStatusPanel.Children[taskId] as TextBlock).Text = $"{taskId}) {puzzlesSearched} Puzzles Searched.";
+            for (int i = 0; i < progress.Length; i++)
+                (threadStatusPanel.Children[i] as TextBlock).Text = $"{i}) {progress[i]} Puzzles Searched.";
+
             overallStatusTextBlock.Text = $"{sum} Total Searched.";
         }
 
@@ -162,6 +151,62 @@ namespace WPFUI
             SolutionWindow window = new SolutionWindow(_viewmodel.Solution.PropertySet, this.Left, this.Top);
             window.Show();
             this.Close();
+        }
+
+        private class GenerationStatusUpdater
+        {
+            private int _ntasks;
+            private Dispatcher _dispatcher;
+            private Action<int[]> _searchProgressCallback;
+
+            private ConcurrentDictionary<int, int> _progressByTaskId;
+            private int _checkingUpdate;
+            private DateTime _lastUpdate;
+            private TimeSpan _updateInterval;
+
+            public GenerationStatusUpdater(int ntasks, Dispatcher dispatcher, Action<int[]> searchProgressCallback)
+            {
+                if (ntasks <= 0)
+                    throw new ArgumentException("Invalid task count given to generation status updater.");
+
+                _ntasks = ntasks;
+                _dispatcher = dispatcher;
+                _searchProgressCallback = searchProgressCallback;
+
+                _progressByTaskId = new ConcurrentDictionary<int, int>();
+
+                for (int i = 0; i < ntasks; i++)
+                    _progressByTaskId[i] = 0;
+
+                _checkingUpdate = 0;
+                _lastUpdate = DateTime.Now;
+                _updateInterval = TimeSpan.FromMilliseconds(100);
+            }
+
+            public void UpdateSearchProgress(int taskId, int puzzlesSearched)
+            {
+                _progressByTaskId[taskId] = puzzlesSearched;
+
+                // Using interlocked because I don't want to block any threads. 
+                // It isn't important for the UI to be completely up-to-date on the number of puzzles searched,
+                // we just need to slow down how often it's updated so it doesn't freeze.
+                if (Interlocked.Exchange(ref _checkingUpdate, 1) == 0)
+                {
+                    if (DateTime.Now - _lastUpdate > _updateInterval)
+                    {
+                        int[] progress = new int[_ntasks];
+
+                        for (int i = 0; i < _ntasks; i++)
+                            progress[i] = _progressByTaskId[i];
+
+                        _dispatcher.BeginInvoke(_searchProgressCallback, progress);
+
+                        _lastUpdate = DateTime.Now;
+                    }
+
+                    Interlocked.Exchange(ref _checkingUpdate, 0);
+                }
+            }
         }
     }
 }
