@@ -50,32 +50,26 @@ namespace WPFUI.ViewModels
 
         public PuzzleGenerator MakeGenerator()
         {
-            IEnumerable<StrategyAnalysis> minTargets =
+            IEnumerable<StrategyTarget> strategyTargets =
                 this.StrategyList.Where(s => s.IsEnabled)
-                .Select(s => new StrategyAnalysis(s.Strategy, s.MinimumApplications.GetValueOrDefault(0)));
+                .Select(s => new StrategyTarget(
+                    s.Strategy, 
+                    s.MinimumApplications ?? 0, 
+                    s.MaximumApplications ?? int.MaxValue));
 
-            IEnumerable<StrategyAnalysis> maxTargets =
-                this.StrategyList.Where(s => s.IsEnabled)
-                .Select(s => new StrategyAnalysis(s.Strategy, s.MaximumApplications.GetValueOrDefault(int.MaxValue)));
 
-            List<ConstraintPattern> patterns = new List<ConstraintPattern>();
+            List<ConstraintTarget> constraintTargets = new List<ConstraintTarget>() {
+                new ConstraintTarget(new DistinctConstraintPattern(), this.MaxDistinctConstraints ?? int.MaxValue),
+                new ConstraintTarget(new EitherOrConstraintPattern(), this.MaxEitherOrConstraints ?? int.MaxValue),
+                new ConstraintTarget(new EqualConstraintPattern(), this.MaxEqualConstraints ?? int.MaxValue),
+                new ConstraintTarget(new IdentityConstraintPattern(), this.MaxIdentityConstraints ?? int.MaxValue),
+                new ConstraintTarget(new LessThanConstraintPattern(), this.MaxLessThanConstraints ?? int.MaxValue),
+                new ConstraintTarget(new NextToConstraintPattern(), this.MaxNextToConstraints ?? int.MaxValue)
+            };
 
             int maxTotal = this.MaxTotalConstraints ?? int.MaxValue;
-            int maxEqual = this.MaxEqualConstraints ?? int.MaxValue;
-            int maxDistinct = this.MaxDistinctConstraints ?? int.MaxValue;
-            int maxIdentity = this.MaxIdentityConstraints ?? int.MaxValue;
-            int maxLessThan = this.MaxLessThanConstraints ?? int.MaxValue;
-            int maxNextTo = this.MaxNextToConstraints ?? int.MaxValue;
-            int maxEitherOr = this.MaxEitherOrConstraints ?? int.MaxValue;
-            
-            if (maxEqual > 0) patterns.Add(new EqualConstraintPattern(maxEqual));
-            if (maxDistinct > 0) patterns.Add(new DistinctConstraintPattern(maxDistinct));
-            if (maxIdentity > 0) patterns.Add(new IdentityConstraintPattern(maxIdentity));
-            if (maxLessThan > 0) patterns.Add(new LessThanConstraintPattern(maxLessThan));
-            if (maxNextTo > 0) patterns.Add(new NextToConstraintPattern(maxNextTo));
-            if (maxEitherOr > 0) patterns.Add(new EitherOrConstraintPattern(maxEitherOr));
 
-            return new PuzzleGenerator(this.Solution, patterns, minTargets, maxTargets, maxTotal);
+            return new PuzzleGenerator(this.Solution, strategyTargets, constraintTargets, maxTotal);
         }
     }
 }

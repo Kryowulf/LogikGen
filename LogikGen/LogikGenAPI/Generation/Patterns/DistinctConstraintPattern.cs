@@ -10,11 +10,6 @@ namespace LogikGenAPI.Generation.Patterns
     {
         public override Type ConstraintType => typeof(DistinctConstraint);
 
-        public DistinctConstraintPattern(int maxCount = int.MaxValue) 
-            : base(maxCount)
-        {
-        }
-
         public override Constraint RandomConstraint(SolutionGrid solution, Random rgen)
         {
             Property row = rgen.Select(solution.PropertySet.Properties);

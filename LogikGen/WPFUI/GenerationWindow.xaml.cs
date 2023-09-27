@@ -73,7 +73,7 @@ namespace WPFUI
                         }
                         else
                         {
-                            PuzzleSolver solver = new PuzzleSolver(pgen.PropertySet, pgen.Strategies);
+                            PuzzleSolver solver = new PuzzleSolver(pgen.PropertySet, pgen.StrategyTargets.Select(t => t.Strategy));
                             solver.AddConstraints(constraints);
                             solver.Resolve();
 
@@ -96,7 +96,7 @@ namespace WPFUI
 
                         newPuzzleCallback(pgen, finalReport);
 
-                        PuzzleSolver solver = new PuzzleSolver(pgen.PropertySet, pgen.Strategies);
+                        PuzzleSolver solver = new PuzzleSolver(pgen.PropertySet, pgen.StrategyTargets.Select(t => t.Strategy));
                         solver.AddConstraints(finalReport.Constraints);
                         IReadOnlyList<string> steps = solver.Explain(true);
 

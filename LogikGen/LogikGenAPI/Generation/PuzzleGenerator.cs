@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,79 +17,74 @@ namespace LogikGenAPI.Generation
     public class PuzzleGenerator
     {
         private const int USELESS_CONSTRAINT_THRESHOLD = 999;
+        private const int PUZZLE_REGEN_THRESHOLD = 5;
 
         public PropertySet PropertySet { get; private set; }
         public SolutionGrid Solution { get; private set; }
-        public IReadOnlyList<Strategy> Strategies { get; private set; }
-        public IReadOnlyList<StrategyAnalysis> MinTargets { get; private set; }
-        public IReadOnlyList<StrategyAnalysis> MaxTargets { get; private set; }
+        public IReadOnlyList<StrategyTarget> StrategyTargets { get; private set; }
+        public IReadOnlyList<ConstraintTarget> ConstraintTargets { get; private set; }
+        public IReadOnlyList<ConstraintPattern> AvailablePatterns { get; private set; }
         public int MaxTotalConstraints { get; private set; }
-        public IReadOnlyList<ConstraintPattern> Patterns { get; private set; }
 
-        // +1 is for whether max constraints is reached.
-        // Each pattern has its own "MaximumCount" target.
-        public int MaxTargetScore => this.MinTargets.Count + this.MaxTargets.Count + this.Patterns.Count + 1;
+        // Each strategy has a target min & max number of applications. 
+        // Each constraint has a desired maximum count.
+        // + 1 for meeting the desired maximum total constraints.
+
+        public int MaxTargetScore => 
+            2 * this.StrategyTargets.Count 
+            + this.ConstraintTargets.Count 
+            + 1;
 
         public PuzzleGenerator(
             PropertySet pset, 
-            int minApplications = 1,
-            int maxApplications = int.MaxValue,
-            int maxTotalConstraints = int.MaxValue,
             int solutionSeed = -1)
         {
+            IReadOnlyList<ConstraintPattern> defaultPatterns = new DefaultConstraintPatternList();
+
             this.PropertySet = pset;
             this.Solution = new PuzzleSolver(pset).Randomize(solutionSeed);
-            this.Strategies = new DefaultStrategyList();
-            this.MinTargets = this.Strategies.Select(s => new StrategyAnalysis(s, minApplications)).ToList().AsReadOnly();
-            this.MaxTargets = this.Strategies.Select(s => new StrategyAnalysis(s, maxApplications)).ToList().AsReadOnly();            
-            this.MaxTotalConstraints = maxTotalConstraints;
-
-            List<ConstraintPattern> patterns = new List<ConstraintPattern>()
-            {
-                new EqualConstraintPattern(),
-                new DistinctConstraintPattern(),
-                new IdentityConstraintPattern(),
-                new LessThanConstraintPattern(),
-                new NextToConstraintPattern(),
-                new EitherOrConstraintPattern()
-            };
-            
-            this.Patterns = patterns.AsReadOnly();
+            this.StrategyTargets = new DefaultStrategyList().Select(s => new StrategyTarget(s)).ToList().AsReadOnly();
+            this.ConstraintTargets = defaultPatterns.Select(p => new ConstraintTarget(p)).ToList().AsReadOnly();
+            this.AvailablePatterns = defaultPatterns;
+            this.MaxTotalConstraints = int.MaxValue;
         }
 
         public PuzzleGenerator(
             SolutionGrid solution, 
-            IEnumerable<ConstraintPattern> patterns, 
-            IEnumerable<StrategyAnalysis> minTargets,
-            IEnumerable<StrategyAnalysis> maxTargets,   
+            IEnumerable<StrategyTarget> strategies, 
+            IEnumerable<ConstraintTarget> constraints,
             int maxTotalConstraints)
         {
+            List<ConstraintPattern> availablePatterns = new DefaultConstraintPatternList().ToList();
+
             this.PropertySet = solution.PropertySet;
             this.Solution = solution;
-            this.Patterns = patterns.ToList().AsReadOnly();
-            this.MinTargets = minTargets.ToList().AsReadOnly();
-            this.MaxTargets = maxTargets.ToList().AsReadOnly();
+            this.StrategyTargets = strategies.ToList().AsReadOnly();
+            this.ConstraintTargets = constraints.ToList().AsReadOnly();
 
-            this.Strategies = this.MinTargets.Select(a => a.Strategy).Union(
-                this.MaxTargets.Select(a => a.Strategy)).ToList().AsReadOnly();
+            foreach (ConstraintTarget t in this.ConstraintTargets.Where(t => t.MaxCount == 0))
+                availablePatterns.Remove(t.Pattern);
 
+            this.AvailablePatterns = availablePatterns.AsReadOnly();
             this.MaxTotalConstraints = maxTotalConstraints;
         }
 
-        public Constraint RandomConstraint(Random rgen)
+        public IList<Constraint> RandomPuzzle(Random rgen, IEnumerable<Constraint> initialConstraints = null, IReadOnlyList<ConstraintPattern> selectedPatterns = null)
         {
-            return rgen.Select(this.Patterns).RandomConstraint(this.Solution, rgen);
-        }
+            initialConstraints = initialConstraints ?? Enumerable.Empty<Constraint>();
+            selectedPatterns = selectedPatterns ?? this.AvailablePatterns;
 
-        public IList<Constraint> RandomPuzzle(Random rgen)
-        {
-            PuzzleSolver solver = new PuzzleSolver(this.PropertySet, this.Strategies);
+            PuzzleSolver solver = new PuzzleSolver(this.PropertySet, this.StrategyTargets.Select(s => s.Strategy));
+            solver.AddConstraints(initialConstraints);
+            solver.Resolve();
+
             int uselessConstraintCount = 0;
 
+            // Keep adding constraints until the puzzle is solved.
             while (!solver.Grid.Solved)
             {
-                Constraint constraint = this.RandomConstraint(rgen);
-                
+                Constraint constraint = rgen.Select(selectedPatterns).RandomConstraint(this.Solution, rgen);
+
                 if (solver.AddConstraint(constraint))
                 {
                     if (solver.Resolve() == 0)
@@ -109,9 +105,17 @@ namespace LogikGenAPI.Generation
                     uselessConstraintCount++;
                 }
 
+                // Counting "useless" constraints is a hack to make sure we're not stuck in an infinite loop.
+                // This can happen if, e.g., we're only generating EitherOr constraints for some reason 
+                // but none of the strategies for processing those are enabled. 
+                
+                // Unlikely to ever happen unless the generator was given stupid settings.
                 if (uselessConstraintCount >= USELESS_CONSTRAINT_THRESHOLD)
                     throw new GenerationException("Unable to create a random puzzle due to insufficient generation parameters.");
             }
+
+
+            // Prune all redundant constraints.
 
             List<Constraint> candidates = solver.Constraints.ToList();
 
@@ -128,26 +132,93 @@ namespace LogikGenAPI.Generation
             return solver.Constraints.ToList().AsReadOnly();
         }
 
+        public bool TrimConstraints(IEnumerable<Constraint> constraints, out List<Constraint> trimmedList, out List<ConstraintPattern> availablePatternsList)
+        {
+            bool wasTrimmed = false;
+
+            trimmedList = new List<Constraint>();
+            Dictionary<Type, int> limitsByConstraintType = new Dictionary<Type, int>();
+            Dictionary<Type, int> countsByConstraintType = new Dictionary<Type, int>();
+            Dictionary<Type, ConstraintPattern> patternsByConstraintType = new Dictionary<Type, ConstraintPattern>();
+            HashSet<ConstraintPattern> enabledPatterns = new HashSet<ConstraintPattern>();
+
+            foreach (ConstraintPattern p in new DefaultConstraintPatternList())
+            {
+                limitsByConstraintType[p.ConstraintType] = int.MaxValue;
+                countsByConstraintType[p.ConstraintType] = 0;
+                patternsByConstraintType[p.ConstraintType] = p;
+                enabledPatterns.Add(p);
+            }
+
+            foreach (ConstraintTarget t in this.ConstraintTargets)
+            {
+                limitsByConstraintType[t.Pattern.ConstraintType] = t.MaxCount;
+
+                if (t.MaxCount == 0)
+                    enabledPatterns.Remove(t.Pattern);
+            }
+
+            foreach(Constraint c in constraints)
+            {
+                countsByConstraintType[c.GetType()]++;
+
+                if (countsByConstraintType[c.GetType()] > limitsByConstraintType[c.GetType()])
+                {
+                    enabledPatterns.Remove(patternsByConstraintType[c.GetType()]);
+                    wasTrimmed = true;
+                }
+                else
+                {
+                    trimmedList.Add(c);
+                }
+            }
+
+            availablePatternsList = enabledPatterns.ToList();
+
+            return wasTrimmed;
+        }
+
         public AnalysisReport FindSatisfyingPuzzle(
-            Action<AnalysisReport> newPuzzleCallback = null, 
-            Action<int> searchProgressCallback = null, 
-            CancellationToken? cancelToken = null, 
+            Action<AnalysisReport> newPuzzleCallback = null,
+            Action<int> searchProgressCallback = null,
+            CancellationToken? cancelToken = null,
             int seed = -1)
         {
             Random rgen = seed >= 0 ? new Random(seed) : new Random();
-            IList<Constraint> constraints = RandomPuzzle(rgen);
-            PuzzleSolver solver = new PuzzleSolver(this.PropertySet, this.Strategies);
-            solver.AddConstraints(constraints);
-
+            PuzzleSolver solver = new PuzzleSolver(this.PropertySet, this.StrategyTargets.Select(t => t.Strategy));
+            
+            IList<Constraint> constraints = RandomPuzzle(rgen);     
+            solver.AddConstraints(constraints);                     
+                                                                    
             AnalysisReport bestAnalysis = solver.FullAnalysis();
             int totalPuzzlesSearched = 1;
 
-            newPuzzleCallback?.Invoke(bestAnalysis);
             searchProgressCallback?.Invoke(totalPuzzlesSearched);
+            newPuzzleCallback?.Invoke(bestAnalysis);
+
+            int regenCounter = 0;
 
             while (!cancelToken.GetValueOrDefault().IsCancellationRequested)
             {
-                constraints = RandomPuzzle(rgen);
+                // First, try modifying the generated puzzle to achieve our constraint targets,
+                // if we can and if we have any targets. 
+                if (this.ConstraintTargets.Count > 0 &&
+                    regenCounter < PUZZLE_REGEN_THRESHOLD && 
+                    TrimConstraints(constraints, out List<Constraint> trimmedList, out List<ConstraintPattern> availablePatternsList) && 
+                    availablePatternsList.Count > 0)
+                {
+                    constraints = RandomPuzzle(rgen, trimmedList, availablePatternsList);
+                    regenCounter++;
+                }
+
+                // otherwise, just create a totally fresh puzzle ignoring the targets.
+                else
+                {
+                    constraints = RandomPuzzle(rgen);
+                    regenCounter = 0;
+                }
+
+                // Try out the generated constraints and compare with the best found so far. 
                 solver.ClearConstraints();
                 solver.ResetAll();
                 solver.AddConstraints(constraints);
@@ -179,7 +250,7 @@ namespace LogikGenAPI.Generation
             int seed = -1)
         {
             Random rgen = seed >= 0 ? new Random(seed) : new Random();
-            PuzzleSolver solver = new PuzzleSolver(this.PropertySet, this.Strategies);
+            PuzzleSolver solver = new PuzzleSolver(this.PropertySet, this.StrategyTargets.Select(t => t.Strategy));
             int totalPuzzlesSearched = 0;
             bool puzzleFound = false;
             IList<Constraint> result = null;
@@ -194,7 +265,7 @@ namespace LogikGenAPI.Generation
                 solver.ResetAll();
 
                 // Keep adding constraints until there is a unique solution.
-                do solver.AddConstraint(RandomConstraint(rgen));
+                do solver.AddConstraint(rgen.Select(this.AvailablePatterns).RandomConstraint(this.Solution, rgen));
                 while (!solver.FindUniqueSolution(out _));
 
                 IList<Constraint> constraints = solver.Constraints.ToList();
@@ -231,7 +302,7 @@ namespace LogikGenAPI.Generation
                 searchProgressCallback?.Invoke(totalPuzzlesSearched);
             }
             while (!puzzleFound &&
-                   !cancelToken.GetValueOrDefault().IsCancellationRequested);
+                    !cancelToken.GetValueOrDefault().IsCancellationRequested);
 
             return result;
         }
@@ -262,13 +333,16 @@ namespace LogikGenAPI.Generation
         {
             int score = 0;
 
-            foreach (StrategyAnalysis target in this.MinTargets)
-                if (report[target.Strategy].ApplicationsNeeded >= target.ApplicationsNeeded)
+            foreach (StrategyTarget target in this.StrategyTargets)
+            {
+                StrategyAnalysis analysis = report[target.Strategy];
+
+                if (analysis.ApplicationsNeeded >= target.MinApplications)
                     score++;
 
-            foreach (StrategyAnalysis target in this.MaxTargets)
-                if (report[target.Strategy].ApplicationsNeeded <= target.ApplicationsNeeded)
+                if (analysis.ApplicationsNeeded <= target.MaxApplications)
                     score++;
+            }
 
             if (report.Constraints.Count <= this.MaxTotalConstraints)
                 score++;
@@ -285,9 +359,9 @@ namespace LogikGenAPI.Generation
                     countsByConstraintType[t] = 1;
             }
 
-            foreach (ConstraintPattern p in this.Patterns)
+            foreach (ConstraintTarget t in this.ConstraintTargets)
             {
-                if (countsByConstraintType.GetValueOrDefault(p.ConstraintType, 0) <= p.MaximumCount)
+                if (countsByConstraintType.GetValueOrDefault(t.Pattern.ConstraintType, 0) <= t.MaxCount)
                     score++;
             }
 

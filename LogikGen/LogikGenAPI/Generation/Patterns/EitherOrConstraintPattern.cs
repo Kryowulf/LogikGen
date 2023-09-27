@@ -12,11 +12,6 @@ namespace LogikGenAPI.Generation.Patterns
     {
         public override Type ConstraintType => typeof(EitherOrConstraint);
 
-        public EitherOrConstraintPattern(int maxCount = int.MaxValue)
-            : base(maxCount)
-        {
-        }
-
         public override Constraint RandomConstraint(SolutionGrid solution, Random rgen)
         {
             Property key = rgen.Select(solution.PropertySet);

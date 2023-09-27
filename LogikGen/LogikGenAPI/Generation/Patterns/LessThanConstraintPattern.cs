@@ -12,11 +12,6 @@ namespace LogikGenAPI.Generation.Patterns
     {
         public override Type ConstraintType => typeof(LessThanConstraint);
 
-        public LessThanConstraintPattern(int maxCount = int.MaxValue)
-            : base(maxCount)
-        {
-        }
-
         public override Constraint RandomConstraint(SolutionGrid solution, Random rgen)
         {
             // Pick one of the ordered categories at random.

@@ -14,11 +14,6 @@ namespace LogikGenAPI.Generation.Patterns
     {
         public override Type ConstraintType => typeof(IdentityConstraint);
 
-        public IdentityConstraintPattern(int maxCount = int.MaxValue)
-            : base(maxCount)
-        {
-        }
-
         public override Constraint RandomConstraint(SolutionGrid solution, Random rgen)
         {
             PropertySet pset = solution.PropertySet;
