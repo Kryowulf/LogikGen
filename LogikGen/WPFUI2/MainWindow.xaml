@@ -1,0 +1,39 @@
+﻿<Window x:Class="WPFUI2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:WPFUI2.Controls"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <DockPanel>
+        <Menu Margin="0, 0, 0, 10" DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="Open"></MenuItem>
+                <MenuItem Header="Save"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Header="Quit"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="Help">
+                <MenuItem Header="Guidebook"></MenuItem>
+                <MenuItem Header="About"></MenuItem>
+            </MenuItem>
+        </Menu>
+        <TabControl>
+            <TabItem Header="Definitions">
+                <StackPanel Orientation="Vertical">
+                    <controls:CategoryGridControl x:Name="catgrid" />
+                    <WrapPanel Orientation="Horizontal">
+                        <Button Name="SampleDataButton" Click="SampleDataButton_Click">Sample Data</Button>
+                        <Button Name="ShuffleButton" Click="ShuffleButton_Click">Shuffle</Button>
+                        <Button Name="ClearButton" Click="ClearButton_Click">Clear</Button>
+                    </WrapPanel>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Solution">
+            </TabItem>
+            <TabItem Header="Generation">
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>
