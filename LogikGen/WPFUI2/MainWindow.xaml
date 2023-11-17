@@ -22,7 +22,7 @@
         <TabControl>
             <TabItem Header="Definitions">
                 <StackPanel Orientation="Vertical">
-                    <controls:CategoryGridControl x:Name="catgrid" />
+                    <controls:DefinitionGridControl x:Name="definitionGrid" />
                     <WrapPanel Orientation="Horizontal">
                         <Button Name="SampleDataButton" Click="SampleDataButton_Click">Sample Data</Button>
                         <Button Name="ShuffleButton" Click="ShuffleButton_Click">Shuffle</Button>
@@ -31,6 +31,13 @@
                 </StackPanel>
             </TabItem>
             <TabItem Header="Solution">
+                <StackPanel Orientation="Vertical">
+                    <controls:SolutionGridControl x:Name="solutionGrid" />
+                    <WrapPanel Orientation="Horizontal">
+                        <Button Name="RandomizeSolutionButton" Click="RandomizeSolutionButton_Click">Randomize</Button>
+                        <Button Name="ResetSolutionButton" Click="ResetSolutionButton_Click">Reset</Button>
+                    </WrapPanel>
+                </StackPanel>
             </TabItem>
             <TabItem Header="Generation">
             </TabItem>

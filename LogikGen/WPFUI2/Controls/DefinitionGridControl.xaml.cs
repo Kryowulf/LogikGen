@@ -21,38 +21,45 @@ namespace WPFUI2.Controls
     /// <summary>
     /// Interaction logic for PropertyDefinitionGridControl.xaml
     /// </summary>
-    public partial class CategoryGridControl : UserControl
+    public partial class DefinitionGridControl : UserControl
     {
         private bool _initialized = false;
 
-        public CategoryGridViewModel ViewModel { get; } = new CategoryGridViewModel();
+        public DefinitionGridViewModel? ViewModel { get; set; }
         
-        public CategoryGridControl()
+        public DefinitionGridControl()
         {
             InitializeComponent();
             _initialized = true;
+
             Refresh();
         }
 
         private void categorySizeInput_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!_initialized)
+            if (!_initialized || ViewModel == null)
                 return;
 
+            // .SelectedValue also gives a ComboBoxItem rather than its content.
             ComboBoxItem selectedItem = (ComboBoxItem)categorySizeInput.SelectedItem;
-            string selectedValue = (string)selectedItem.Content;
-            ViewModel.SelectedCategorySize = int.Parse(selectedValue);
+            string selectedItemContent = (string)selectedItem.Content;
+            int selectedSize = int.Parse(selectedItemContent);
+            ViewModel.SelectedCategorySize = selectedSize;
+
             Refresh();
         }
 
         private void categoryCountInput_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!_initialized)
+            if (!_initialized || ViewModel == null)
                 return;
 
+            // .SelectedValue also gives a ComboBoxItem rather than its content.
             ComboBoxItem selectedItem = (ComboBoxItem)categoryCountInput.SelectedItem;
-            string selectedValue = (string)selectedItem.Content;
-            ViewModel.SelectedCategoryCount = int.Parse(selectedValue);
+            string selectedItemContent = (string)selectedItem.Content;
+            int selectedCount = int.Parse((string)selectedItemContent);
+            ViewModel.SelectedCategoryCount = selectedCount;
+
             Refresh();
         }
 
@@ -61,6 +68,9 @@ namespace WPFUI2.Controls
             gridPanel.Children.Clear();
             gridPanel.RowDefinitions.Clear();
             gridPanel.ColumnDefinitions.Clear();
+
+            if (ViewModel == null)
+                return;
 
             // + 1 for the heading at row 0.
             int nrows = ViewModel.SelectedCategoryCount + 1;

@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace WPFUI2.Viewmodels
 {
-    public class PropertyDefinitionViewModel
+    public class PropertyDefinitionViewModel : ViewModel
     {
-        public string Name { get; set; } = "";
+        private string _name = "";
+        public string Name { 
+            get { return _name; }
+            set { SetValue(ref _name, value); }
+        }
     }
 }

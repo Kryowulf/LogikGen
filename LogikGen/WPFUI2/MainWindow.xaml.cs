@@ -25,80 +25,43 @@ namespace WPFUI2
     /// </summary>
     public partial class MainWindow : Window
     {
+        private DefinitionGridViewModel _definitionsVM;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            _definitionsVM = new DefinitionGridViewModel();
+
+            definitionGrid.ViewModel = _definitionsVM;
+            solutionGrid.ViewModel = _definitionsVM;
+            definitionGrid.Refresh();
+            solutionGrid.Refresh();
         }
 
         private void SampleDataButton_Click(object sender, RoutedEventArgs e)
         {
-            int categoryCount = CategoryGridViewModel.MaxCategoryCount;
-            int categorySize = CategoryGridViewModel.MaxCategorySize;
-
-            for (int catIndex = 0; catIndex < categoryCount; catIndex++)
-            {
-                CategoryDefinition def = ZebraPuzzleBuilder.AvailableCategories[catIndex];
-                CategoryDefinitionViewModel defVM = catgrid.ViewModel.Categories[catIndex];
-
-                defVM.Name = def.CategoryName;
-                defVM.IsOrdered = def.IsOrdered;
-
-                for (int propIndex = 0; propIndex < categorySize; propIndex++)
-                {
-                    defVM.Properties[propIndex].Name = def.PropertyNames[propIndex];
-                }
-            }
-
-            catgrid.Refresh();
+            _definitionsVM.PopulateWithSampleData();
         }
 
         private void ShuffleButton_Click(object sender, RoutedEventArgs e)
         {
-            Random rgen = new Random();
-
-            // Only shuffle what's visible, not the whole 8x8 grid.
-            int categoryCount = catgrid.ViewModel.SelectedCategoryCount;
-            int categorySize = catgrid.ViewModel.SelectedCategorySize;
-
-            for (int catIndex = 0; catIndex < categoryCount; catIndex++)
-            {
-                CategoryDefinitionViewModel defVM = catgrid.ViewModel.Categories[catIndex];
-
-                // Ordered categories shouldn't be shuffled.
-                if (!defVM.IsOrdered)
-                {
-                    List<string> shuffledProperties = defVM.Properties.Take(categorySize).Select(p => p.Name).ToList();
-                    rgen.Shuffle(shuffledProperties);
-                    
-                    for (int propIndex = 0; propIndex < categorySize; propIndex++)
-                    {
-                        defVM.Properties[propIndex].Name = shuffledProperties[propIndex];
-                    }
-                }
-            }
-
-            catgrid.Refresh();
+            _definitionsVM.Shuffle();
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
-            int categoryCount = CategoryGridViewModel.MaxCategoryCount;
-            int categorySize = CategoryGridViewModel.MaxCategorySize;
+            _definitionsVM.Clear();
+        }
 
-            for (int catIndex = 0; catIndex < categoryCount; catIndex++)
-            {
-                CategoryDefinitionViewModel defVM = catgrid.ViewModel.Categories[catIndex];
+        private void RandomizeSolutionButton_Click(object sender, RoutedEventArgs e)
+        {
+            _definitionsVM.RandomizeSolution();
+        }
 
-                defVM.Name = "";
-                defVM.IsOrdered = false;
-
-                for (int propIndex = 0; propIndex < categorySize; propIndex++)
-                {
-                    defVM.Properties[propIndex].Name = "";
-                }
-            }
-
-            catgrid.Refresh();
+        private void ResetSolutionButton_Click(object sender, RoutedEventArgs e)
+        {
+            _definitionsVM.ResetSolution();
         }
     }
 }
