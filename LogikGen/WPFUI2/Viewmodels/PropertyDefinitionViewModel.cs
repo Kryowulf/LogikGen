@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WPFUI2.Viewmodels
+namespace WPFUI2.ViewModels
 {
     public class PropertyDefinitionViewModel : ViewModel
     {

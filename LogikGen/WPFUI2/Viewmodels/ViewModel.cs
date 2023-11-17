@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace WPFUI2.Viewmodels
+namespace WPFUI2.ViewModels
 {
     public abstract class ViewModel : INotifyPropertyChanged
     {

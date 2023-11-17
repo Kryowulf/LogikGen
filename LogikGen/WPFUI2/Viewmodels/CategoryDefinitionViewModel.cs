@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
 
-namespace WPFUI2.Viewmodels
+namespace WPFUI2.ViewModels
 {
     public class CategoryDefinitionViewModel : ViewModel
     {

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Automation;
 using System.Windows.Media;
 
-namespace WPFUI2.Viewmodels
+namespace WPFUI2.ViewModels
 {
     public class DefinitionGridViewModel : ViewModel
     {

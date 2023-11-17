@@ -16,7 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WPFUI2.Controls;
-using WPFUI2.Viewmodels;
+using WPFUI2.ViewModels;
 
 namespace WPFUI2
 {
