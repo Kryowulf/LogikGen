@@ -16,16 +16,16 @@ namespace LogikGenAPI.Resolution.Strategies
         [Description("Simple Domain")]
         SimpleDomain,
 
-        [Description("Constraint Generation")]
-        ConstraintGeneration,
+        [Description("Double NextTo")]
+        DoubleNextTo,
 
         [Description("Compatibility Check")]
         CompatibilityCheck,
 
-        [Description("Double NextTo")]
-        DoubleNextTo,
+        [Description("Binary Constraint Analysis")]
+        BinaryConstraintAnalysis,
 
-        [Description("Other")]
-        Other
+        [Description("Constraint Generation")]
+        ConstraintGeneration,
     }
 }

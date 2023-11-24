@@ -6,10 +6,10 @@ namespace LogikGenAPI.Resolution.Strategies
 {
     public class EitherOrArgumentUnionStrategy : Strategy
     {
-        public override StrategyClassification Classification => StrategyClassification.Other;
+        public override StrategyClassification Classification => StrategyClassification.SimpleDomain;
         public override bool AutoRepeat => true;
 
-        public override Difficulty Difficulty => Difficulty.Medium;
+        public override Difficulty Difficulty => Difficulty.Hard;
 
         protected override bool ApplyOnce(PuzzleGrid grid, ConstraintSet cset)
         {

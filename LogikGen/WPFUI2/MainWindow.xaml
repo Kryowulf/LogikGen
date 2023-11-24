@@ -3,44 +3,142 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:controls="clr-namespace:WPFUI2.Controls"
+        xmlns:controls="clr-namespace:WPFUI2.Controls" 
+        xmlns:componentmodel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <DockPanel>
-        <Menu Margin="0, 0, 0, 10" DockPanel.Dock="Top">
-            <MenuItem Header="File">
-                <MenuItem Header="Open"></MenuItem>
-                <MenuItem Header="Save"></MenuItem>
-                <Separator></Separator>
-                <MenuItem Header="Quit"></MenuItem>
-            </MenuItem>
-            <MenuItem Header="Help">
-                <MenuItem Header="Guidebook"></MenuItem>
-                <MenuItem Header="About"></MenuItem>
-            </MenuItem>
-        </Menu>
-        <TabControl>
-            <TabItem Header="Definitions">
-                <StackPanel Orientation="Vertical">
-                    <controls:DefinitionGridControl x:Name="definitionGrid" />
+    <Window.Resources>
+        <Style x:Key="ClassificationHeaderStyle" TargetType="{x:Type GroupItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type GroupItem}">
+                        <StackPanel>
+                            <Border BorderBrush="DarkGray" BorderThickness="1" Margin="5,5,5,5">
+                                <TextBlock Text="{Binding Name}" Padding="2,2,2,2" FontWeight="Bold" FontSize="16" />
+                            </Border>
+                            <ItemsPresenter />
+                        </StackPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <CollectionViewSource x:Key="StrategyListCollectionViewSource" Source="{Binding Path=StrategyList}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="ClassificationDescription" />
+            </CollectionViewSource.GroupDescriptions>
+            <CollectionViewSource.SortDescriptions>
+                <componentmodel:SortDescription PropertyName="Classification" />
+                <componentmodel:SortDescription PropertyName="Name" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+    </Window.Resources>
+    <TabControl>
+        <TabItem Header="Definitions">
+            <StackPanel Orientation="Vertical">
+                <controls:DefinitionGridControl x:Name="definitionGrid" />
+                <WrapPanel Orientation="Horizontal">
+                    <Button Name="SampleDataButton" Click="SampleDataButton_Click">Sample Data</Button>
+                    <Button Name="ShuffleButton" Click="ShuffleButton_Click">Shuffle</Button>
+                    <Button Name="ClearButton" Click="ClearButton_Click">Clear</Button>
+                </WrapPanel>
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="Solution">
+            <StackPanel Orientation="Vertical">
+                <controls:SolutionGridControl x:Name="solutionGrid" />
+                <WrapPanel Orientation="Horizontal">
+                    <Button Name="RandomizeSolutionButton" Click="RandomizeSolutionButton_Click">Randomize</Button>
+                    <Button Name="ResetSolutionButton" Click="ResetSolutionButton_Click">Reset</Button>
+                </WrapPanel>
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="Generation">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <GroupBox Header="Presets" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left">
                     <WrapPanel Orientation="Horizontal">
-                        <Button Name="SampleDataButton" Click="SampleDataButton_Click">Sample Data</Button>
-                        <Button Name="ShuffleButton" Click="ShuffleButton_Click">Shuffle</Button>
-                        <Button Name="ClearButton" Click="ClearButton_Click">Clear</Button>
+                        <Button>Easy</Button>
+                        <Button>Medium</Button>
+                        <Button>Hard</Button>
                     </WrapPanel>
-                </StackPanel>
-            </TabItem>
-            <TabItem Header="Solution">
-                <StackPanel Orientation="Vertical">
-                    <controls:SolutionGridControl x:Name="solutionGrid" />
-                    <WrapPanel Orientation="Horizontal">
-                        <Button Name="RandomizeSolutionButton" Click="RandomizeSolutionButton_Click">Randomize</Button>
-                        <Button Name="ResetSolutionButton" Click="ResetSolutionButton_Click">Reset</Button>
-                    </WrapPanel>
-                </StackPanel>
-            </TabItem>
-            <TabItem Header="Generation">
-            </TabItem>
-        </TabControl>
-    </DockPanel>
+                </GroupBox>
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1">
+                    Puzzles Searched: 1024<LineBreak/>
+                    Speed: 400 puzzles/second<LineBreak/>
+                    [Satisfied]
+                </TextBlock>
+                <GroupBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right">
+                    <StackPanel Orientation="Vertical">
+                        <Button>Generate</Button>
+                        <CheckBox>Unsolvable</CheckBox>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Available Strategies" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"> 
+                    <DataGrid x:Name="strategyGrid" ItemsSource="{Binding Source={StaticResource StrategyListCollectionViewSource}}" 
+                                AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" 
+                                ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                        <DataGrid.GroupStyle>
+                            <GroupStyle ContainerStyle="{StaticResource ClassificationHeaderStyle}">
+                                <GroupStyle.Panel>
+                                    <ItemsPanelTemplate>
+                                        <DataGridRowsPresenter />
+                                    </ItemsPanelTemplate>
+                                </GroupStyle.Panel>
+                            </GroupStyle>
+                        </DataGrid.GroupStyle>
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Header="Enabled" Binding="{Binding Path=IsEnabled}" />
+                            <DataGridTextColumn Header="Strategy" Binding="{Binding Path=Name, Mode=OneWay}" SortMemberPath="Name" />
+                            <DataGridTextColumn Header="Difficulty" Binding="{Binding Path=Difficulty, Mode=OneWay}" />
+                            <DataGridTextColumn Header="Min." Binding="{Binding Path=MinimumApplications, TargetNullValue=''}" />
+                            <DataGridTextColumn Header="Max." Binding="{Binding Path=MaximumApplications, TargetNullValue=''}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+                <GroupBox Header="Maximum Constraint Counts" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Left">
+                    <Grid HorizontalAlignment="Left">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0">Total:</TextBlock>
+                        <TextBox Width="100" Grid.Row="0" Grid.Column="1" Text="{Binding Path=MaxTotalConstraints, TargetNullValue=''}" />
+                        <TextBlock Grid.Row="1" Grid.Column="0">Equal:</TextBlock>
+                        <TextBox Width="100" Grid.Row="1" Grid.Column="1" Text="{Binding Path=MaxEqualConstraints, TargetNullValue=''}" />
+                        <TextBlock Grid.Row="1" Grid.Column="2">Distinct:</TextBlock>
+                        <TextBox Width="100" Grid.Row="1" Grid.Column="3" Text="{Binding Path=MaxDistinctConstraints, TargetNullValue=''}" />
+                        <TextBlock Grid.Row="1" Grid.Column="4">Identity:</TextBlock>
+                        <TextBox Width="100" Grid.Row="1" Grid.Column="5" Text="{Binding Path=MaxIdentityConstraints, TargetNullValue=''}" />
+                        <TextBlock Grid.Row="2" Grid.Column="0">Less Than:</TextBlock>
+                        <TextBox Width="100" Grid.Row="2" Grid.Column="1" Text="{Binding Path=MaxLessThanConstraints, TargetNullValue=''}" />
+                        <TextBlock Grid.Row="2" Grid.Column="2">Next To:</TextBlock>
+                        <TextBox Width="100" Grid.Row="2" Grid.Column="3" Text="{Binding Path=MaxNextToConstraints, TargetNullValue=''}" />
+                        <TextBlock Grid.Row="2" Grid.Column="4">Either Or:</TextBlock>
+                        <TextBox Width="100" Grid.Row="2" Grid.Column="5" Text="{Binding Path=MaxEitherOrConstraints, TargetNullValue=''}" />
+                    </Grid>
+                </GroupBox>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Results">
+        </TabItem>
+    </TabControl>
+
 </Window>

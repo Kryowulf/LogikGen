@@ -25,43 +25,43 @@ namespace WPFUI2
     /// </summary>
     public partial class MainWindow : Window
     {
-        private DefinitionGridViewModel _definitionsVM;
+        private MainViewModel _viewmodel = new MainViewModel();
 
         public MainWindow()
         {
+            this.DataContext = _viewmodel;
+
             InitializeComponent();
 
-            _definitionsVM = new DefinitionGridViewModel();
-
-            definitionGrid.ViewModel = _definitionsVM;
-            solutionGrid.ViewModel = _definitionsVM;
+            definitionGrid.ViewModel = _viewmodel.Definitions;
+            solutionGrid.ViewModel = _viewmodel.Definitions;
             definitionGrid.Refresh();
             solutionGrid.Refresh();
         }
 
         private void SampleDataButton_Click(object sender, RoutedEventArgs e)
         {
-            _definitionsVM.PopulateWithSampleData();
+            _viewmodel.Definitions.PopulateWithSampleData();
         }
 
         private void ShuffleButton_Click(object sender, RoutedEventArgs e)
         {
-            _definitionsVM.Shuffle();
+            _viewmodel.Definitions.Shuffle();
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
-            _definitionsVM.Clear();
+            _viewmodel.Definitions.Clear();
         }
 
         private void RandomizeSolutionButton_Click(object sender, RoutedEventArgs e)
         {
-            _definitionsVM.RandomizeSolution();
+            _viewmodel.Definitions.RandomizeSolution();
         }
 
         private void ResetSolutionButton_Click(object sender, RoutedEventArgs e)
         {
-            _definitionsVM.ResetSolution();
+            _viewmodel.Definitions.ResetSolution();
         }
     }
 }

@@ -50,7 +50,7 @@ namespace LogikGenAPI.Resolution.Strategies
 
     public class BinaryConstraintAnalysisStrategy : MultipleConstraintStrategy
     {
-        public override StrategyClassification Classification => StrategyClassification.Other;
+        public override StrategyClassification Classification => StrategyClassification.BinaryConstraintAnalysis;
         public override bool AutoRepeat => true;
 
         public BinaryConstraintAnalysisStrategy(IndirectionLevel level) 
