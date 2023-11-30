@@ -1,5 +1,6 @@
 ﻿using LogikGenAPI.Examples;
 using LogikGenAPI.Model;
+using LogikGenAPI.Resolution;
 using LogikGenAPI.Utilities;
 using System;
 using System.Collections.Generic;
@@ -145,6 +146,49 @@ namespace WPFUI2.ViewModels
                 for (int j = 0; j < SelectedCategorySize; j++)
                     SolutionMatrix[i, j].SelectedPropertyIndex = selections[j];
             }
+        }
+
+        public void BuildModel(out PropertySet pset, out SolutionGrid solution)
+        {
+            try
+            {
+                var categoryDefinitions = this.Categories.Take(SelectedCategoryCount)
+                                          .Select(c => new CategoryDefinition(
+                                              c.Name.Trim(),
+                                              c.IsOrdered,
+                                              c.Properties
+                                                .Take(SelectedCategorySize)
+                                                .Select(p => p.Name.Trim())));
+
+                pset = new PropertySet(categoryDefinitions);
+            }
+            catch(ArgumentException ex)
+            {
+                throw new InvalidDefinitionException(ex.Message, ex);
+            }
+
+            PuzzleGrid grid = new PuzzleGrid(pset);
+
+            for (int entIndex = 0; entIndex < pset.CategorySize; entIndex++)
+            {
+                // The columns of the solution matrix represents the different "entities" 
+                // (the distinct objects to whom a property of each category is associated).
+                // The properties selected for the first row/category can serve as each entity's representative.
+                int representativeIndex = SolutionMatrix[0, entIndex].SelectedPropertyIndex;
+                Property representative = pset.Categories[0].Properties[representativeIndex];
+
+                // Assocate the selected properties across all other categories to this representative. 
+                for (int catIndex = 1; catIndex < pset.Categories.Count; catIndex++)
+                {
+                    int associatedIndex = SolutionMatrix[catIndex, entIndex].SelectedPropertyIndex;
+                    Property associated = pset.Categories[catIndex].Properties[associatedIndex];
+
+                    grid.Associate(representative, associated);
+                }
+            }
+
+            grid.Synchronize();
+            solution = grid.AsSolution();
         }
     }
 }

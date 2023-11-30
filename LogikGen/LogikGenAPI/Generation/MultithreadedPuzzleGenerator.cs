@@ -6,6 +6,7 @@ using LogikGenAPI.Resolution.Strategies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace LogikGenAPI.Generation
 
         public async Task<AnalysisReport> FindSatisfyingPuzzle(
             Action<AnalysisReport> newPuzzleCallback = null,
-            Action<int, int> searchProgressCallback = null,
+            Action<int, int, int> searchProgressCallback = null,
             CancellationToken? cancelToken = null,
             int seed = -1,
             int nTasks = -1)
@@ -36,9 +37,12 @@ namespace LogikGenAPI.Generation
             object bestLock = new object();
             AnalysisReport globalBest = null;
 
+            int totalProgress = 0;
+            
             for (int i = 0; i < nTasks; i++)
             {
                 int taskId = i;
+
                 tasks.Add(Task.Run(() => this.Prototype.FindSatisfyingPuzzle(
                     (newReport) =>
                     {
@@ -51,7 +55,7 @@ namespace LogikGenAPI.Generation
                             }
                         }
                     },
-                    (totalReports) => searchProgressCallback(taskId, totalReports),
+                    (taskProgress) => searchProgressCallback(Interlocked.Increment(ref totalProgress), taskId, taskProgress),
                     cts.Token,
                     rgen.Next())));
             }
@@ -68,7 +72,7 @@ namespace LogikGenAPI.Generation
         }
 
         public async Task<IList<Constraint>> FindUnsolvablePuzzle(
-            Action<int, int> searchProgressCallback = null,
+            Action<int, int, int> searchProgressCallback = null,
             CancellationToken? cancelToken = null,
             int unsolvableDepth = - 1,
             int seed = -1, 
@@ -79,12 +83,14 @@ namespace LogikGenAPI.Generation
             List<Task<IList<Constraint>>> tasks = new List<Task<IList<Constraint>>>(nTasks);
             CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken.GetValueOrDefault());
 
+            int totalProgress = 0;
+            
             for (int i = 0; i < nTasks; i++)
             {
                 int taskId = i;
 
                 tasks.Add(Task.Run(() => this.Prototype.FindUnsolvablePuzzle(
-                    (totalReports) => searchProgressCallback(taskId, totalReports),
+                    (taskProgress) => searchProgressCallback(Interlocked.Increment(ref totalProgress), taskId, taskProgress),
                     cts.Token,
                     unsolvableDepth,
                     rgen.Next())));

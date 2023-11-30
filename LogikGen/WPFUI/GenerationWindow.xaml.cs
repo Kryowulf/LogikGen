@@ -183,9 +183,9 @@ namespace WPFUI
                 _updateInterval = TimeSpan.FromMilliseconds(100);
             }
 
-            public void UpdateSearchProgress(int taskId, int puzzlesSearched)
+            public void UpdateSearchProgress(int totalProgress, int taskId, int taskProgress)
             {
-                _progressByTaskId[taskId] = puzzlesSearched;
+                _progressByTaskId[taskId] = taskProgress;
 
                 // Using interlocked because I don't want to block any threads. 
                 // It isn't important for the UI to be completely up-to-date on the number of puzzles searched,

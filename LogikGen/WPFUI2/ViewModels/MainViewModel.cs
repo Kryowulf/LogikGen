@@ -1,4 +1,7 @@
-﻿using LogikGenAPI.Resolution.Strategies;
+﻿using LogikGenAPI.Generation;
+using LogikGenAPI.Model;
+using LogikGenAPI.Resolution;
+using LogikGenAPI.Resolution.Strategies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +12,7 @@ namespace WPFUI2.ViewModels
 {
     public class MainViewModel
     {
+        public ThreadSafeProgressViewModel ProgressModel { get; private set; }
         public DefinitionGridViewModel Definitions { get; private set; }
         public IList<StrategyViewModel> StrategyList { get; private set; }
         public ConstraintTargetsViewModel ConstraintTargets { get; private set; }
@@ -16,6 +20,7 @@ namespace WPFUI2.ViewModels
 
         public MainViewModel()
         {
+            this.ProgressModel = new ThreadSafeProgressViewModel();
             this.Definitions = new DefinitionGridViewModel();
             this.StrategyList = new List<StrategyViewModel>();
             this.ConstraintTargets = new ConstraintTargetsViewModel();
@@ -24,6 +29,27 @@ namespace WPFUI2.ViewModels
             this.StrategyList = new DefaultStrategyList()
                                 .Select(s => new StrategyViewModel(s))
                                 .ToList();
+        }
+
+        public void BuildDefinitionModel(out PropertySet pset, out SolutionGrid solution)
+        {
+            this.Definitions.BuildModel(out pset, out solution);
+        }
+
+        public IList<StrategyTarget> BuildStrategyTargets()
+        {
+            return StrategyList
+                    .Where(s => s.IsEnabled)
+                    .Select(s => new StrategyTarget(
+                        s.Strategy, 
+                        s.MinimumApplications ?? 0, 
+                        s.MaximumApplications ?? int.MaxValue))
+                    .ToList();
+        }
+
+        public IList<ConstraintTarget> BuildConstraintTargets()
+        {
+            return this.ConstraintTargets.BuildConstraintTargets();
         }
     }
 }

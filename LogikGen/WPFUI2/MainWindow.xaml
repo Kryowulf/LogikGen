@@ -32,20 +32,20 @@
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
     </Window.Resources>
-    <TabControl>
+    <TabControl Name="mainWindowTabs">
         <TabItem Header="Definitions">
             <StackPanel Orientation="Vertical">
-                <controls:DefinitionGridControl x:Name="definitionGrid" />
+                <controls:DefinitionGridControl x:Name="defgridControl" />
                 <WrapPanel Orientation="Horizontal">
                     <Button Name="SampleDataButton" Click="SampleDataButton_Click">Sample Data</Button>
-                    <Button Name="ShuffleButton" Click="ShuffleButton_Click">Shuffle</Button>
-                    <Button Name="ClearButton" Click="ClearButton_Click">Clear</Button>
+                    <Button Name="ShuffleDefinitionsButton" Click="ShuffleDefinitionsButton_Click">Shuffle</Button>
+                    <Button Name="ClearDefinitionsButton" Click="ClearDefinitionsButton_Click">Clear</Button>
                 </WrapPanel>
             </StackPanel>
         </TabItem>
         <TabItem Header="Solution">
             <StackPanel Orientation="Vertical">
-                <controls:SolutionGridControl x:Name="solutionGrid" />
+                <controls:SolutionGridControl x:Name="solgridControl" />
                 <WrapPanel Orientation="Horizontal">
                     <Button Name="RandomizeSolutionButton" Click="RandomizeSolutionButton_Click">Randomize</Button>
                     <Button Name="ResetSolutionButton" Click="ResetSolutionButton_Click">Reset</Button>
@@ -71,16 +71,23 @@
                         <Button>Hard</Button>
                     </WrapPanel>
                 </GroupBox>
-                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1">
-                    Puzzles Searched: 1024<LineBreak/>
-                    Speed: 400 puzzles/second<LineBreak/>
-                    [Satisfied]
-                </TextBlock>
+                <TextBlock Name="StatusOutput" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" 
+                           DataContext="{Binding Path=ProgressModel}"
+                           Text="{Binding Path=ProgressDisplay}" />
                 <GroupBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right">
-                    <StackPanel Orientation="Vertical">
-                        <Button>Generate</Button>
-                        <CheckBox>Unsolvable</CheckBox>
-                    </StackPanel>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Row="0" Grid.Column="0" Name="GenerateButton" Click="GenerateButton_Click">Generate</Button>
+                        <Button Grid.Row="0" Grid.Column="1" Name="ViewResultsButton" Click="ViewResultsButton_Click">View Results</Button>
+                        <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding Path=IsGenerateUnsolvableChecked}">Unsolvable</CheckBox>
+                    </Grid>
                 </GroupBox>
                 <GroupBox Header="Available Strategies" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"> 
                     <DataGrid x:Name="strategyGrid" ItemsSource="{Binding Source={StaticResource StrategyListCollectionViewSource}}" 
@@ -120,24 +127,22 @@
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Row="0" Grid.Column="0">Total:</TextBlock>
-                        <TextBox Width="100" Grid.Row="0" Grid.Column="1" Text="{Binding Path=MaxTotalConstraints, TargetNullValue=''}" />
+                        <TextBox Width="100" Grid.Row="0" Grid.Column="1" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxTotalConstraints, TargetNullValue=''}" />
                         <TextBlock Grid.Row="1" Grid.Column="0">Equal:</TextBlock>
-                        <TextBox Width="100" Grid.Row="1" Grid.Column="1" Text="{Binding Path=MaxEqualConstraints, TargetNullValue=''}" />
+                        <TextBox Width="100" Grid.Row="1" Grid.Column="1" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxEqualConstraints, TargetNullValue=''}" />
                         <TextBlock Grid.Row="1" Grid.Column="2">Distinct:</TextBlock>
-                        <TextBox Width="100" Grid.Row="1" Grid.Column="3" Text="{Binding Path=MaxDistinctConstraints, TargetNullValue=''}" />
+                        <TextBox Width="100" Grid.Row="1" Grid.Column="3" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxDistinctConstraints, TargetNullValue=''}" />
                         <TextBlock Grid.Row="1" Grid.Column="4">Identity:</TextBlock>
-                        <TextBox Width="100" Grid.Row="1" Grid.Column="5" Text="{Binding Path=MaxIdentityConstraints, TargetNullValue=''}" />
+                        <TextBox Width="100" Grid.Row="1" Grid.Column="5" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxIdentityConstraints, TargetNullValue=''}" />
                         <TextBlock Grid.Row="2" Grid.Column="0">Less Than:</TextBlock>
-                        <TextBox Width="100" Grid.Row="2" Grid.Column="1" Text="{Binding Path=MaxLessThanConstraints, TargetNullValue=''}" />
+                        <TextBox Width="100" Grid.Row="2" Grid.Column="1" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxLessThanConstraints, TargetNullValue=''}" />
                         <TextBlock Grid.Row="2" Grid.Column="2">Next To:</TextBlock>
-                        <TextBox Width="100" Grid.Row="2" Grid.Column="3" Text="{Binding Path=MaxNextToConstraints, TargetNullValue=''}" />
+                        <TextBox Width="100" Grid.Row="2" Grid.Column="3" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxNextToConstraints, TargetNullValue=''}" />
                         <TextBlock Grid.Row="2" Grid.Column="4">Either Or:</TextBlock>
-                        <TextBox Width="100" Grid.Row="2" Grid.Column="5" Text="{Binding Path=MaxEitherOrConstraints, TargetNullValue=''}" />
+                        <TextBox Width="100" Grid.Row="2" Grid.Column="5" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxEitherOrConstraints, TargetNullValue=''}" />
                     </Grid>
                 </GroupBox>
             </Grid>
-        </TabItem>
-        <TabItem Header="Results">
         </TabItem>
     </TabControl>
 
