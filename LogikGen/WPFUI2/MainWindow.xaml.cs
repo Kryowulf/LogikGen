@@ -31,6 +31,7 @@ namespace WPFUI2
     {
         private MainViewModel _viewmodel;
         private CancellationTokenSource? _cts;
+        private ResultsWindow? _resultWindow;
 
         public MainWindow()
         {
@@ -72,6 +73,8 @@ namespace WPFUI2
             _viewmodel.Definitions.ResetSolution();
         }
 
+        
+
         bool _isRunning = false;
         private async void GenerateButton_Click(object sender, RoutedEventArgs e)
         {
@@ -80,10 +83,11 @@ namespace WPFUI2
                 _isRunning = true;
                 GenerateButton.Content = "Cancel";
 
-                ResultsWindow results = new ResultsWindow();
-                results.Owner = this;
-                results.Show();
-                results.DataContext = _viewmodel.ProgressModel;
+                if (_resultWindow == null)
+                    _resultWindow = new ResultsWindow(this, _viewmodel.ProgressModel);
+
+                _resultWindow.Show();
+                
                 await Task.Run(() => RunGenerataor());
             }
             else
@@ -96,7 +100,10 @@ namespace WPFUI2
 
         private void ViewResultsButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_resultWindow == null)
+                _resultWindow = new ResultsWindow(this, _viewmodel.ProgressModel);
 
+            _resultWindow.Show();
         }
 
         private async void RunGenerataor()

@@ -64,7 +64,8 @@ namespace WPFUI2.ViewModels
                         int speed = timeDelta == 0 ? -1 : (1000 * progressDelta / timeDelta);
 
                         this.ProgressDisplay = $"Puzzles Searched: {totalProgress}\n" +
-                                               $"Speed: {speed}/sec";
+                                               $"Speed: {speed}/sec\n" + 
+                                               (_lastReportSatisfied ? "[SATISFIED]" : "[UNSATISFIED]");
                     }
 
                     _lastTotalProgress = totalProgress;

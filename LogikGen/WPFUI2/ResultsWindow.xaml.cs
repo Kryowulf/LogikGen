@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using WPFUI2.ViewModels;
 
 namespace WPFUI2
 {
@@ -20,9 +21,18 @@ namespace WPFUI2
     /// </summary>
     public partial class ResultsWindow : Window
     {
-        public ResultsWindow()
+        public ResultsWindow(Window owner, ThreadSafeProgressViewModel viewmodel)
         {
             InitializeComponent();
+
+            this.Owner = owner;
+            this.DataContext = viewmodel;
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            e.Cancel = true;
+            this.Hide();
         }
     }
 }
