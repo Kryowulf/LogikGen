@@ -10,13 +10,22 @@ using System.Threading.Tasks;
 
 namespace WPFUI2.ViewModels
 {
-    public class MainViewModel
+    public class MainViewModel : ViewModel
     {
         public ThreadSafeProgressViewModel ProgressModel { get; private set; }
         public DefinitionGridViewModel Definitions { get; private set; }
         public IList<StrategyViewModel> StrategyList { get; private set; }
         public ConstraintTargetsViewModel ConstraintTargets { get; private set; }
         public bool IsGenerateUnsolvableChecked { get; set; }
+
+
+        private bool _isRunning;
+        public bool IsRunning 
+        { 
+            get { return _isRunning; }
+            set { SetValue(ref _isRunning, value); }
+        }
+
 
         public MainViewModel()
         {
@@ -25,6 +34,7 @@ namespace WPFUI2.ViewModels
             this.StrategyList = new List<StrategyViewModel>();
             this.ConstraintTargets = new ConstraintTargetsViewModel();
             this.IsGenerateUnsolvableChecked = false;
+            this.IsRunning = false;
 
             this.StrategyList = new DefaultStrategyList()
                                 .Select(s => new StrategyViewModel(s))

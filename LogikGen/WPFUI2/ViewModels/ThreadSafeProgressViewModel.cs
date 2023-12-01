@@ -1,4 +1,5 @@
 ﻿using LogikGenAPI.Generation;
+using LogikGenAPI.Model.Constraints;
 using LogikGenAPI.Resolution;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace WPFUI2.ViewModels
@@ -106,6 +108,28 @@ namespace WPFUI2.ViewModels
         public void ShowMessage(string message)
         {
             this.ResultDisplay = message;
+        }
+
+        internal void UpdateUnsolvableResult(IList<Constraint> constraints)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine(constraints.Count + " total constraints.");
+            sb.AppendLine(string.Join("\n", constraints.Select(c => c.ToString())));
+            sb.AppendLine();
+
+            if (this.Generator != null)
+            {
+                PuzzleSolver solver = new PuzzleSolver(Generator.PropertySet, Generator.StrategyTargets.Select(s => s.Strategy));
+                solver.AddConstraints(constraints);
+                solver.Resolve();
+
+                sb.AppendLine(GridPrinter.BuildGridString(solver.Grid));
+                sb.AppendLine();
+                sb.AppendLine(GridPrinter.BuildGridString(Generator.Solution));
+            }
+
+            this.ResultDisplay = sb.ToString();
         }
     }
 }

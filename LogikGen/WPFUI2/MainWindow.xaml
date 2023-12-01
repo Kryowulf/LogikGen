@@ -84,7 +84,14 @@
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <Button Grid.Row="0" Grid.Column="0" Name="GenerateButton" Click="GenerateButton_Click">Generate</Button>
+                        <Button Grid.Row="0" Grid.Column="0" Content="Generate"
+                                Name="GenerateButton" 
+                                Click="GenerateButton_Click" 
+                                Visibility="{Binding Path=IsRunning, Converter={StaticResource ResourceKey=FalseAsVisibleConverter}}" />
+                        <Button Grid.Row="0" Grid.Column="0" Content="Cancel"
+                                Name="CancelButton" 
+                                Click="CancelButton_Click"
+                                Visibility="{Binding Path=IsRunning, Converter={StaticResource ResourceKey=TrueAsVisibleConverter}}"/>
                         <Button Grid.Row="0" Grid.Column="1" Name="ViewResultsButton" Click="ViewResultsButton_Click">View Results</Button>
                         <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding Path=IsGenerateUnsolvableChecked}">Unsolvable</CheckBox>
                     </Grid>

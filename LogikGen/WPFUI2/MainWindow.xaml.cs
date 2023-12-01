@@ -73,32 +73,22 @@ namespace WPFUI2
             _viewmodel.Definitions.ResetSolution();
         }
 
-        
-
-        bool _isRunning = false;
-        private async void GenerateButton_Click(object sender, RoutedEventArgs e)
+        private void GenerateButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_isRunning == false)
-            {
-                _isRunning = true;
-                GenerateButton.Content = "Cancel";
+            RunGenerataor();
+        }
 
-                if (_resultWindow == null)
-                    _resultWindow = new ResultsWindow(this, _viewmodel.ProgressModel);
-
-                _resultWindow.Show();
-                
-                await Task.Run(() => RunGenerataor());
-            }
-            else
-            {
-                _cts?.Cancel();
-                _isRunning = false;
-                GenerateButton.Content = "Generate";
-            }
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            _cts?.Cancel();
         }
 
         private void ViewResultsButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenResultsWindow();
+        }
+
+        private void OpenResultsWindow()
         {
             if (_resultWindow == null)
                 _resultWindow = new ResultsWindow(this, _viewmodel.ProgressModel);
@@ -108,6 +98,11 @@ namespace WPFUI2
 
         private async void RunGenerataor()
         {
+            if (_viewmodel.IsRunning)
+                return;
+
+            _viewmodel.IsRunning = true;
+
             PropertySet pset;
             SolutionGrid solution;
 
@@ -119,6 +114,7 @@ namespace WPFUI2
             {
                 mainWindowTabs.SelectedIndex = 0;
                 MessageBox.Show("Every category & property must have a unique name.", "Incomplete Definition", MessageBoxButton.OK, MessageBoxImage.Error);
+                _viewmodel.IsRunning = false;
                 return;
             }
 
@@ -132,12 +128,25 @@ namespace WPFUI2
 
             _viewmodel.ProgressModel.Generator = pgen;
 
+            OpenResultsWindow();
+
             try
             {
 
                 if (_viewmodel.IsGenerateUnsolvableChecked)
                 {
-                    _viewmodel.ProgressModel.ShowMessage("Unsolvable Search Not Implemented Yet.");
+                    IList<Constraint>? constraints = await Task.Run(() => mpgen.FindUnsolvablePuzzle(
+                            _viewmodel.ProgressModel.UpdateSearchProgress, 
+                            _cts.Token));
+
+                    if (constraints == null)
+                    {
+                        _viewmodel.ProgressModel.ShowMessage("Cancelled");
+                    }
+                    else
+                    {
+                        _viewmodel.ProgressModel.UpdateUnsolvableResult(constraints);
+                    }
                 }
                 else
                 {
@@ -159,6 +168,8 @@ namespace WPFUI2
 
             _cts.Dispose();
             _cts = null;
+
+            _viewmodel.IsRunning = false;
         }
     }
 }
