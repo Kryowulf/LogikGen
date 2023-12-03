@@ -33,6 +33,16 @@ namespace WPFUI2
         private CancellationTokenSource? _cts;
         private ResultsWindow? _resultWindow;
 
+        // SizeToContent almost does what I want but not completely.
+        // It requires the strategy list to have a hard-coded MaxHeight, which looks ugly
+        // when the user manually resizes the window.
+
+        // As a hack, if the user manually resizes the window while the generation tab is open,
+        // their preferred height will be remembered and the strategy list's MaxHeight will be eliminated.
+        // All other tabs will automatically switch back to SizeToContent = Height.
+
+        private double? _generationTabDesiredHeight = null;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -112,7 +122,7 @@ namespace WPFUI2
             }
             catch (InvalidDefinitionException)
             {
-                mainWindowTabs.SelectedIndex = 0;
+                MainWindowTabs.SelectedIndex = 0;
                 MessageBox.Show("Every category & property must have a unique name.", "Incomplete Definition", MessageBoxButton.OK, MessageBoxImage.Error);
                 _viewmodel.IsRunning = false;
                 return;
@@ -170,6 +180,33 @@ namespace WPFUI2
             _cts = null;
 
             _viewmodel.IsRunning = false;
+        }
+
+        private void MainWindowTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (MainWindowTabs.SelectedItem == GenerationTab && _generationTabDesiredHeight.HasValue)
+            {
+                // Setting SizeToContent will immediately fire Window_SizeChanged, 
+                // thereby causing _generationTabDesiredHeight itself to change.
+                // Thus, its current value needs to be saved.
+
+                double desiredHeight = _generationTabDesiredHeight.Value;
+                this.SizeToContent = SizeToContent.Manual;
+                this.Height = desiredHeight;
+            }
+            else
+            {
+                this.SizeToContent = SizeToContent.Height;
+            }
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (MainWindowTabs.SelectedItem == GenerationTab && this.SizeToContent == SizeToContent.Manual)
+            {
+                _generationTabDesiredHeight = this.Height;
+                strategyGrid.MaxHeight = double.MaxValue;
+            }
         }
     }
 }

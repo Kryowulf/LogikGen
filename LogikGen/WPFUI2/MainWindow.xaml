@@ -6,8 +6,29 @@
         xmlns:controls="clr-namespace:WPFUI2.Controls" 
         xmlns:componentmodel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="LogikGen Zebra Puzzle Generator" Width="800" SizeToContent="Height" SizeChanged="Window_SizeChanged">
     <Window.Resources>
+        <Style TargetType="TabItem">
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Margin" Value="3,3,3,3"/>
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Width" Value="150" />
+            <Setter Property="Margin" Value="2,2,20,2" />
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="2,2,2,2" />
+        </Style>
+        <Style TargetType="controls:DefinitionGridControl">
+            <Setter Property="Margin" Value="5,20,10,10" />
+        </Style>
+        <Style TargetType="GroupBox">
+            <Setter Property="Margin" Value="5,5,5,5" />
+        </Style>
         <Style x:Key="ClassificationHeaderStyle" TargetType="{x:Type GroupItem}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -32,94 +53,66 @@
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
     </Window.Resources>
-    <TabControl Name="mainWindowTabs">
-        <TabItem Header="Definitions">
-            <StackPanel Orientation="Vertical">
+    <TabControl Name="MainWindowTabs" SelectionChanged="MainWindowTabs_SelectionChanged">
+        <TabItem Name="DefinitionsTab" Header="Definitions">
+            <StackPanel Orientation="Vertical" Margin="5,0,0,0">
                 <controls:DefinitionGridControl x:Name="defgridControl" />
-                <WrapPanel Orientation="Horizontal">
+                <WrapPanel Orientation="Horizontal" Margin="4,4,4,4">
                     <Button Name="SampleDataButton" Click="SampleDataButton_Click">Sample Data</Button>
                     <Button Name="ShuffleDefinitionsButton" Click="ShuffleDefinitionsButton_Click">Shuffle</Button>
                     <Button Name="ClearDefinitionsButton" Click="ClearDefinitionsButton_Click">Clear</Button>
                 </WrapPanel>
             </StackPanel>
         </TabItem>
-        <TabItem Header="Solution">
+        <TabItem Name="SolutionsTab" Header="Solution">
             <StackPanel Orientation="Vertical">
-                <controls:SolutionGridControl x:Name="solgridControl" />
-                <WrapPanel Orientation="Horizontal">
+                <controls:SolutionGridControl x:Name="solgridControl" Margin="0,20,0,0" />
+                <WrapPanel Orientation="Horizontal" Margin="10,10,0,0">
                     <Button Name="RandomizeSolutionButton" Click="RandomizeSolutionButton_Click">Randomize</Button>
                     <Button Name="ResetSolutionButton" Click="ResetSolutionButton_Click">Reset</Button>
                 </WrapPanel>
             </StackPanel>
         </TabItem>
-        <TabItem Header="Generation">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <GroupBox Header="Presets" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left">
-                    <WrapPanel Orientation="Horizontal">
-                        <Button>Easy</Button>
-                        <Button>Medium</Button>
-                        <Button>Hard</Button>
-                    </WrapPanel>
-                </GroupBox>
-                <TextBlock Name="StatusOutput" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" 
-                           DataContext="{Binding Path=ProgressModel}"
-                           Text="{Binding Path=ProgressDisplay}" />
-                <GroupBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <Button Grid.Row="0" Grid.Column="0" Content="Generate"
-                                Name="GenerateButton" 
-                                Click="GenerateButton_Click" 
-                                Visibility="{Binding Path=IsRunning, Converter={StaticResource ResourceKey=FalseAsVisibleConverter}}" />
-                        <Button Grid.Row="0" Grid.Column="0" Content="Cancel"
-                                Name="CancelButton" 
-                                Click="CancelButton_Click"
-                                Visibility="{Binding Path=IsRunning, Converter={StaticResource ResourceKey=TrueAsVisibleConverter}}"/>
-                        <Button Grid.Row="0" Grid.Column="1" Name="ViewResultsButton" Click="ViewResultsButton_Click">View Results</Button>
-                        <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding Path=IsGenerateUnsolvableChecked}">Unsolvable</CheckBox>
-                    </Grid>
-                </GroupBox>
-                <GroupBox Header="Available Strategies" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"> 
-                    <DataGrid x:Name="strategyGrid" ItemsSource="{Binding Source={StaticResource StrategyListCollectionViewSource}}" 
-                                AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" 
-                                ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible">
-                        <DataGrid.GroupStyle>
-                            <GroupStyle ContainerStyle="{StaticResource ClassificationHeaderStyle}">
-                                <GroupStyle.Panel>
-                                    <ItemsPanelTemplate>
-                                        <DataGridRowsPresenter />
-                                    </ItemsPanelTemplate>
-                                </GroupStyle.Panel>
-                            </GroupStyle>
-                        </DataGrid.GroupStyle>
-                        <DataGrid.Columns>
-                            <DataGridCheckBoxColumn Header="Enabled" Binding="{Binding Path=IsEnabled}" />
-                            <DataGridTextColumn Header="Strategy" Binding="{Binding Path=Name, Mode=OneWay}" SortMemberPath="Name" />
-                            <DataGridTextColumn Header="Difficulty" Binding="{Binding Path=Difficulty, Mode=OneWay}" />
-                            <DataGridTextColumn Header="Min." Binding="{Binding Path=MinimumApplications, TargetNullValue=''}" />
-                            <DataGridTextColumn Header="Max." Binding="{Binding Path=MaximumApplications, TargetNullValue=''}" />
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </GroupBox>
-                <GroupBox Header="Maximum Constraint Counts" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Left">
-                    <Grid HorizontalAlignment="Left">
+        <TabItem Name="GenerationTab" Header="Generation">
+            <DockPanel>
+                <DockPanel DockPanel.Dock="Top">
+                    <GroupBox Header="Presets" DockPanel.Dock="Left" HorizontalAlignment="Left">
+                        <WrapPanel Orientation="Horizontal">
+                            <Button>Easy</Button>
+                            <Button>Medium</Button>
+                            <Button>Hard</Button>
+                        </WrapPanel>
+                    </GroupBox>
+                    <GroupBox Header="Generate" DockPanel.Dock="Right" HorizontalAlignment="Right">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Row="0" Grid.Column="0" Content="Start"
+                                    Background="LightGreen"
+                                    Name="GenerateButton" 
+                                    Click="GenerateButton_Click" 
+                                    Visibility="{Binding Path=IsRunning, Converter={StaticResource ResourceKey=FalseAsVisibleConverter}}" />
+                            <Button Grid.Row="0" Grid.Column="0" Content="Stop"
+                                    Background="LightSalmon"
+                                    Name="CancelButton" 
+                                    Click="CancelButton_Click"
+                                    Visibility="{Binding Path=IsRunning, Converter={StaticResource ResourceKey=TrueAsVisibleConverter}}"/>
+                            <Button Grid.Row="0" Grid.Column="1" Name="ViewResultsButton" Click="ViewResultsButton_Click">View Results</Button>
+                            <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding Path=IsGenerateUnsolvableChecked}">Unsolvable</CheckBox>
+                        </Grid>
+                    </GroupBox>
+                    <TextBlock Name="StatusOutput" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               DataContext="{Binding Path=ProgressModel}"
+                               Text="{Binding Path=ProgressDisplay}" />
+                </DockPanel>
+                <GroupBox Header="Maximum Constraint Counts" DockPanel.Dock="Bottom" HorizontalAlignment="Left">
+                    <Grid HorizontalAlignment="Left" Margin="5,5,5,5">
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition />
@@ -149,7 +142,29 @@
                         <TextBox Width="100" Grid.Row="2" Grid.Column="5" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxEitherOrConstraints, TargetNullValue=''}" />
                     </Grid>
                 </GroupBox>
-            </Grid>
+                <GroupBox Header="Available Strategies"> 
+                    <DataGrid x:Name="strategyGrid" ItemsSource="{Binding Source={StaticResource StrategyListCollectionViewSource}}" 
+                                AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" 
+                                ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" MaxHeight="600">
+                        <DataGrid.GroupStyle>
+                            <GroupStyle ContainerStyle="{StaticResource ClassificationHeaderStyle}">
+                                <GroupStyle.Panel>
+                                    <ItemsPanelTemplate>
+                                        <DataGridRowsPresenter />
+                                    </ItemsPanelTemplate>
+                                </GroupStyle.Panel>
+                            </GroupStyle>
+                        </DataGrid.GroupStyle>
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Header="Enabled" Binding="{Binding Path=IsEnabled}" />
+                            <DataGridTextColumn Header="Strategy" Binding="{Binding Path=Name, Mode=OneWay}" SortMemberPath="Name" />
+                            <DataGridTextColumn Header="Difficulty" Binding="{Binding Path=Difficulty, Mode=OneWay}" />
+                            <DataGridTextColumn Header="Min." Binding="{Binding Path=MinimumApplications, TargetNullValue=''}" />
+                            <DataGridTextColumn Header="Max." Binding="{Binding Path=MaximumApplications, TargetNullValue=''}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+            </DockPanel>
         </TabItem>
     </TabControl>
 

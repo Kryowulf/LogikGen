@@ -91,6 +91,8 @@ namespace WPFUI2.Controls
                 gridPanel.ColumnDefinitions.Add(cdef);
             }
 
+            gridPanel.ColumnDefinitions[ncols - 1].SetValue(ColumnDefinition.WidthProperty, GridLength.Auto);
+
             TextBlock heading1 = new TextBlock();
             heading1.Text = "Category Name";
             heading1.SetValue(Grid.RowProperty, 0);
@@ -116,6 +118,7 @@ namespace WPFUI2.Controls
                 TextBox categoryNameInput = new TextBox();
                 categoryNameInput.SetValue(Grid.RowProperty, rowIndex);
                 categoryNameInput.SetValue(Grid.ColumnProperty, 0);
+                categoryNameInput.SetValue(Grid.StyleProperty, Resources["CategoryName"] as Style);
                 gridPanel.Children.Add(categoryNameInput);
 
                 categoryNameInput.DataContext = ViewModel.Categories[categoryIndex];
