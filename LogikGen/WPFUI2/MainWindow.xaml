@@ -6,7 +6,7 @@
         xmlns:controls="clr-namespace:WPFUI2.Controls" 
         xmlns:componentmodel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         mc:Ignorable="d"
-        Title="LogikGen Zebra Puzzle Generator" Width="800" SizeToContent="Height" SizeChanged="Window_SizeChanged">
+        Title="LogikGen Zebra Puzzle Generator" Width="800" SizeToContent="Height"  SizeChanged="Window_SizeChanged">
     <Window.Resources>
         <Style TargetType="TabItem">
             <Setter Property="FontSize" Value="14" />
@@ -16,8 +16,13 @@
             <Setter Property="Margin" Value="3,3,3,3"/>
             <Setter Property="FontSize" Value="14" />
         </Style>
+        <Style TargetType="Button" x:Key="PresetButton">
+            <Setter Property="Width" Value="75"/>
+            <Setter Property="Margin" Value="3,3,3,3"/>
+            <Setter Property="FontSize" Value="14" />            
+        </Style>
         <Style TargetType="TextBox">
-            <Setter Property="Width" Value="150" />
+            <Setter Property="Width" Value="75" />
             <Setter Property="Margin" Value="2,2,20,2" />
         </Style>
         <Style TargetType="TextBlock">
@@ -76,14 +81,14 @@
         <TabItem Name="GenerationTab" Header="Generation">
             <DockPanel>
                 <DockPanel DockPanel.Dock="Top">
-                    <GroupBox Header="Presets" DockPanel.Dock="Left" HorizontalAlignment="Left">
+                    <GroupBox Header="Presets" DockPanel.Dock="Left" HorizontalAlignment="Left" VerticalAlignment="Top">
                         <WrapPanel Orientation="Horizontal">
-                            <Button>Easy</Button>
-                            <Button>Medium</Button>
-                            <Button>Hard</Button>
+                            <Button Name="EasyButton" Style="{StaticResource PresetButton}" Click="EasyButton_Click">Easy</Button>
+                            <Button Name="MediumButton" Style="{StaticResource PresetButton}" Click="MediumButton_Click">Medium</Button>
+                            <Button Name="HardButton" Style="{StaticResource PresetButton}" Click="HardButton_Click">Hard</Button>
                         </WrapPanel>
                     </GroupBox>
-                    <GroupBox Header="Generate" DockPanel.Dock="Right" HorizontalAlignment="Right">
+                    <GroupBox Header="Generate" DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Top">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
@@ -111,38 +116,29 @@
                                DataContext="{Binding Path=ProgressModel}"
                                Text="{Binding Path=ProgressDisplay}" />
                 </DockPanel>
-                <GroupBox Header="Maximum Constraint Counts" DockPanel.Dock="Bottom" HorizontalAlignment="Left">
-                    <Grid HorizontalAlignment="Left" Margin="5,5,5,5">
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Row="0" Grid.Column="0">Total:</TextBlock>
-                        <TextBox Width="100" Grid.Row="0" Grid.Column="1" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxTotalConstraints, TargetNullValue=''}" />
-                        <TextBlock Grid.Row="1" Grid.Column="0">Equal:</TextBlock>
-                        <TextBox Width="100" Grid.Row="1" Grid.Column="1" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxEqualConstraints, TargetNullValue=''}" />
-                        <TextBlock Grid.Row="1" Grid.Column="2">Distinct:</TextBlock>
-                        <TextBox Width="100" Grid.Row="1" Grid.Column="3" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxDistinctConstraints, TargetNullValue=''}" />
-                        <TextBlock Grid.Row="1" Grid.Column="4">Identity:</TextBlock>
-                        <TextBox Width="100" Grid.Row="1" Grid.Column="5" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxIdentityConstraints, TargetNullValue=''}" />
-                        <TextBlock Grid.Row="2" Grid.Column="0">Less Than:</TextBlock>
-                        <TextBox Width="100" Grid.Row="2" Grid.Column="1" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxLessThanConstraints, TargetNullValue=''}" />
-                        <TextBlock Grid.Row="2" Grid.Column="2">Next To:</TextBlock>
-                        <TextBox Width="100" Grid.Row="2" Grid.Column="3" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxNextToConstraints, TargetNullValue=''}" />
-                        <TextBlock Grid.Row="2" Grid.Column="4">Either Or:</TextBlock>
-                        <TextBox Width="100" Grid.Row="2" Grid.Column="5" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxEitherOrConstraints, TargetNullValue=''}" />
-                    </Grid>
+                <GroupBox Header="Maximum Number of Constraints in Puzzle (blank signifies no limit)" HorizontalAlignment="Left" DockPanel.Dock="Bottom">
+                    <UniformGrid Rows="3" Columns="6" Margin="5,5,5,5">
+                        <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right">Total:</TextBlock>
+                        <TextBox Grid.Row="0" Grid.Column="1" DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxTotalConstraints, TargetNullValue=''}" />
+                        <TextBlock/>
+                        <TextBlock/>
+                        <TextBlock/>
+                        <TextBlock/>
+                        <TextBlock HorizontalAlignment="Right">Equal:</TextBlock>
+                        <TextBox DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxEqualConstraints, TargetNullValue=''}" />
+                        <TextBlock HorizontalAlignment="Right">Distinct:</TextBlock>
+                        <TextBox DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxDistinctConstraints, TargetNullValue=''}" />
+                        <TextBlock HorizontalAlignment="Right">Identity:</TextBlock>
+                        <TextBox DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxIdentityConstraints, TargetNullValue=''}" />
+                        <TextBlock HorizontalAlignment="Right">Less Than:</TextBlock>
+                        <TextBox DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxLessThanConstraints, TargetNullValue=''}" />
+                        <TextBlock HorizontalAlignment="Right">Next To:</TextBlock>
+                        <TextBox DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxNextToConstraints, TargetNullValue=''}" />
+                        <TextBlock HorizontalAlignment="Right">Either Or:</TextBlock>
+                        <TextBox DataContext="{Binding Path=ConstraintTargets}" Text="{Binding Path=MaxEitherOrConstraints, TargetNullValue=''}" />
+                    </UniformGrid>
                 </GroupBox>
-                <GroupBox Header="Available Strategies"> 
+                <GroupBox Header="Available Strategies (see guidebook for details or use a preset above)"> 
                     <DataGrid x:Name="strategyGrid" ItemsSource="{Binding Source={StaticResource StrategyListCollectionViewSource}}" 
                                 AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" 
                                 ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible" MaxHeight="600">

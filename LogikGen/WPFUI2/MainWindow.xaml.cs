@@ -208,5 +208,20 @@ namespace WPFUI2
                 strategyGrid.MaxHeight = double.MaxValue;
             }
         }
+
+        private void EasyButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Strategies now configured for an overall easy puzzle.", "Difficulty Preset", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void MediumButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Strategies now configured for an overall medium puzzle.", "Difficulty Preset", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void HardButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Strategies now configured for an overall difficult puzzle.", "Difficulty Preset", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
     }
 }
