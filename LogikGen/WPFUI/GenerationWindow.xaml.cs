@@ -64,46 +64,18 @@ namespace WPFUI
                 {
                     if (_viewmodel.IsGenerateUnsolvableChecked)
                     {
-                        IList<Constraint> constraints = await Task.Run(() => mpgen.FindUnsolvablePuzzle(
+                        UnsolvableAnalysisReport report = await Task.Run(() => mpgen.FindUnsolvablePuzzle(
                             updater.UpdateSearchProgress, _cts.Token, unsolvableDepth, seed, nthreads));
 
-                        if (constraints == null)
-                        {
-                            outputTextbox.Text = "Cancelled";
-                        }
-                        else
-                        {
-                            PuzzleSolver solver = new PuzzleSolver(pgen.PropertySet, pgen.StrategyTargets.Select(t => t.Strategy));
-                            solver.AddConstraints(constraints);
-                            solver.Resolve();
-
-                            StringBuilder output = new StringBuilder();
-                            output.AppendLine(constraints.Count + " total constraints.");
-                            output.AppendLine(string.Join("\n", constraints.Select(c => c.ToString())));
-                            output.AppendLine();
-                            output.AppendLine(GridPrinter.BuildGridString(solver.Grid));
-                            output.AppendLine();
-                            output.AppendLine(GridPrinter.BuildGridString(pgen.Solution));
-
-                            outputTextbox.Text = output.ToString();
-                        }
+                        outputTextbox.Text = report.Print();
                     }
                     else
                     {
-                        AnalysisReport finalReport = await Task.Run(() => mpgen.FindSatisfyingPuzzle(
-                            (report) => this.Dispatcher.BeginInvoke(new Action<PuzzleGenerator, AnalysisReport>(newPuzzleCallback), pgen, report),
+                        GenerationAnalysisReport finalReport = await Task.Run(() => mpgen.FindSatisfyingPuzzle(
+                            (report) => this.Dispatcher.BeginInvoke(() => outputTextbox.Text = report.PrintBrief()),
                             updater.UpdateSearchProgress, _cts.Token, seed, nthreads));
 
-                        newPuzzleCallback(pgen, finalReport);
-
-                        PuzzleSolver solver = new PuzzleSolver(pgen.PropertySet, pgen.StrategyTargets.Select(t => t.Strategy));
-                        solver.AddConstraints(finalReport.Constraints);
-                        IReadOnlyList<string> steps = solver.Explain(true);
-
-                        outputTextbox.Text += "\n";
-
-                        foreach (string step in steps)
-                            outputTextbox.Text += step + "\n";
+                        outputTextbox.Text = finalReport.PrintComplete();
                     }
                 }
                 catch(Exception ex)
@@ -125,12 +97,6 @@ namespace WPFUI
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             _cts?.Cancel();
-        }
-
-        private void newPuzzleCallback(PuzzleGenerator pgen, AnalysisReport report)
-        {
-            string heading = pgen.SatisfiesTargets(report) ? "[SATISFIED]" : "[UNSATISFIED]";
-            outputTextbox.Text = heading + "\n" + report.Print();
         }
 
         private void searchProgressCallback(int[] progress)

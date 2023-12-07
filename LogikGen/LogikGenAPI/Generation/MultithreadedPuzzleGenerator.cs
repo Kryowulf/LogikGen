@@ -22,8 +22,8 @@ namespace LogikGenAPI.Generation
             this.Prototype = prototype;
         }
 
-        public async Task<AnalysisReport> FindSatisfyingPuzzle(
-            Action<AnalysisReport> newPuzzleCallback = null,
+        public async Task<GenerationAnalysisReport> FindSatisfyingPuzzle(
+            Action<GenerationAnalysisReport> newPuzzleCallback = null,
             Action<int, int, int> searchProgressCallback = null,
             CancellationToken? cancelToken = null,
             int seed = -1,
@@ -31,11 +31,11 @@ namespace LogikGenAPI.Generation
         {
             Random rgen = seed >= 0 ? new Random(seed) : new Random();
             nTasks = nTasks > 0 ? nTasks : Environment.ProcessorCount;
-            List<Task<AnalysisReport>> tasks = new List<Task<AnalysisReport>>(nTasks);
+            List<Task<GenerationAnalysisReport>> tasks = new List<Task<GenerationAnalysisReport>>(nTasks);
             CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken.GetValueOrDefault());
 
             object bestLock = new object();
-            AnalysisReport globalBest = null;
+            GenerationAnalysisReport globalBest = null;
 
             int totalProgress = 0;
             
@@ -48,7 +48,7 @@ namespace LogikGenAPI.Generation
                     {
                         lock (bestLock)
                         {
-                            if (globalBest == null || this.Prototype.SelectPreferred(globalBest, newReport) == newReport)
+                            if (globalBest == null || newReport.CompareTo(globalBest) > 0)
                             {
                                 globalBest = newReport;
                                 newPuzzleCallback(globalBest);
@@ -60,18 +60,19 @@ namespace LogikGenAPI.Generation
                     rgen.Next())));
             }
 
-            AnalysisReport[] reports = await Task.WhenAll(tasks);
-            AnalysisReport best = reports[0];
+            GenerationAnalysisReport[] reports = await Task.WhenAll(tasks);
+            GenerationAnalysisReport best = reports[0];
 
-            foreach (AnalysisReport report in reports)
-                best = this.Prototype.SelectPreferred(best, report);
+            foreach (GenerationAnalysisReport report in reports)
+                if (report.CompareTo(best) > 0)
+                    best = report;
 
             cts.Dispose();
 
             return best;
         }
 
-        public async Task<IList<Constraint>> FindUnsolvablePuzzle(
+        public async Task<UnsolvableAnalysisReport> FindUnsolvablePuzzle(
             Action<int, int, int> searchProgressCallback = null,
             CancellationToken? cancelToken = null,
             int unsolvableDepth = - 1,
@@ -80,7 +81,7 @@ namespace LogikGenAPI.Generation
         {
             Random rgen = seed >= 0 ? new Random(seed) : new Random();
             nTasks = nTasks > 0 ? nTasks : Environment.ProcessorCount;
-            List<Task<IList<Constraint>>> tasks = new List<Task<IList<Constraint>>>(nTasks);
+            List<Task<UnsolvableAnalysisReport>> tasks = new List<Task<UnsolvableAnalysisReport>>(nTasks);
             CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancelToken.GetValueOrDefault());
 
             int totalProgress = 0;
@@ -96,8 +97,8 @@ namespace LogikGenAPI.Generation
                     rgen.Next())));
             }
 
-            Task<IList<Constraint>> completedTask = await Task.WhenAny(tasks);
-            IList<Constraint> constraints = await completedTask;
+            Task<UnsolvableAnalysisReport> completedTask = await Task.WhenAny(tasks);
+            UnsolvableAnalysisReport report = await completedTask;
 
             cts.Cancel();
 
@@ -105,7 +106,7 @@ namespace LogikGenAPI.Generation
 
             cts.Dispose();
 
-            return constraints;
+            return report;
         }
     }
 }

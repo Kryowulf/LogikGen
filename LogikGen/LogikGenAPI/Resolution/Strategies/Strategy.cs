@@ -34,14 +34,14 @@ namespace LogikGenAPI.Resolution.Strategies
             }
 
             if (updated && this.LogGridOnUpdate)
-                this.Logger.LogInfo("\n" + GridPrinter.BuildGridString(grid));
+                this.Logger.LogInfo("\n" + GridPrinter.BuildGridString(grid), false);
 
             return updated;
         }
 
         private class DummyLogger : Logger
         {
-            public override void LogInfo(object data)
+            public override void LogInfo(object data, bool includeTag = true)
             {
             }
 

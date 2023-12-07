@@ -12,10 +12,5 @@ namespace LogikGenAPI.Resolution
             this.Strategy = strategy;
             this.ApplicationsNeeded = applicationsNeeded;
         }
-
-        public override string ToString()
-        {
-            return $"[{this.Strategy}: {this.ApplicationsNeeded}]";
-        }
     }
 }

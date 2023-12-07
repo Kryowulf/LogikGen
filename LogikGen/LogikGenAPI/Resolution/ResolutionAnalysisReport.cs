@@ -7,7 +7,7 @@ using System.Text;
 
 namespace LogikGenAPI.Resolution
 {
-    public class AnalysisReport : IComparable<AnalysisReport>
+    public class ResolutionAnalysisReport : IComparable<ResolutionAnalysisReport>
     {
         private Dictionary<Strategy, StrategyAnalysis> _analysesByStrategy;
         private Dictionary<string, StrategyAnalysis> _analysesByName;
@@ -19,7 +19,7 @@ namespace LogikGenAPI.Resolution
         public StrategyAnalysis this[Strategy s] => _analysesByStrategy[s];
         public StrategyAnalysis this[string name] => _analysesByName[name];
 
-        public AnalysisReport(SolutionGrid solution, IEnumerable<Constraint> constraints, IEnumerable<StrategyAnalysis> analyses)
+        public ResolutionAnalysisReport(SolutionGrid solution, IEnumerable<Constraint> constraints, IEnumerable<StrategyAnalysis> analyses)
         {
             _analysesByStrategy = new Dictionary<Strategy, StrategyAnalysis>();
             _analysesByName = new Dictionary<string, StrategyAnalysis>();
@@ -35,7 +35,7 @@ namespace LogikGenAPI.Resolution
             }
         }
 
-        public int CompareTo(AnalysisReport other)
+        public int CompareTo(ResolutionAnalysisReport other)
         {
             // Get a list of all difficulty levels in reverse order, from hardest to easiest.
             List<Difficulty> difficulties = Enum.GetValues<Difficulty>().ToList();
@@ -67,28 +67,6 @@ namespace LogikGenAPI.Resolution
             }
 
             return 0;
-        }
-
-        public string Print()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.AppendLine(this.Constraints.Count + " total constraints.");
-
-            foreach (Constraint constraint in this.Constraints)
-                sb.AppendLine(constraint.ToString());
-
-            sb.AppendLine();
-
-            foreach (StrategyAnalysis analysis in this.Analyses.OrderBy(a => a.Strategy.Name))
-                sb.AppendLine(analysis.ToString());
-
-            sb.AppendLine();
-            sb.AppendLine(GridPrinter.BuildGridString(this.Solution));
-            sb.AppendLine();
-            sb.AppendLine(GridPrinter.BuildSolutionTableString(this.Solution));
-
-            return sb.ToString();
         }
     }
 }

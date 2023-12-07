@@ -12,7 +12,7 @@ namespace WPFUI2.ViewModels
 {
     public class MainViewModel : ViewModel
     {
-        public ThreadSafeProgressViewModel ProgressModel { get; private set; }
+        public ProgressViewModel ProgressModel { get; private set; }
         public DefinitionGridViewModel Definitions { get; private set; }
         public IList<StrategyViewModel> StrategyList { get; private set; }
         public ConstraintTargetsViewModel ConstraintTargets { get; private set; }
@@ -29,7 +29,7 @@ namespace WPFUI2.ViewModels
 
         public MainViewModel()
         {
-            this.ProgressModel = new ThreadSafeProgressViewModel();
+            this.ProgressModel = new ProgressViewModel();
             this.Definitions = new DefinitionGridViewModel();
             this.StrategyList = new List<StrategyViewModel>();
             this.ConstraintTargets = new ConstraintTargetsViewModel();

@@ -21,7 +21,7 @@ namespace WPFUI2
     /// </summary>
     public partial class ResultsWindow : Window
     {
-        public ResultsWindow(Window owner, ThreadSafeProgressViewModel viewmodel)
+        public ResultsWindow(Window owner, ProgressViewModel viewmodel)
         {
             InitializeComponent();
 

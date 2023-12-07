@@ -157,7 +157,7 @@ namespace LogikGenAPI.Resolution
             return logger.GetCurrentLog();
         }
 
-        public AnalysisReport QuickAnalysis()
+        public ResolutionAnalysisReport QuickAnalysis()
         {
             this.ResetAll();
 
@@ -192,10 +192,10 @@ namespace LogikGenAPI.Resolution
             IEnumerable<StrategyAnalysis> analyses = this.Strategies.Select(
                 s => new StrategyAnalysis(s, applications[s]));
 
-            return new AnalysisReport(_grid.AsSolution(), _primaryConstraints, analyses);
+            return new ResolutionAnalysisReport(_grid.AsSolution(), _primaryConstraints, analyses);
         }
 
-        public AnalysisReport FullAnalysis()
+        public ResolutionAnalysisReport FullAnalysis()
         {
             this.ResetAll();
             this.Resolve();
@@ -244,7 +244,7 @@ namespace LogikGenAPI.Resolution
             IEnumerable<StrategyAnalysis> analyses = this.Strategies.Select(
                 s => new StrategyAnalysis(s, applications[s]));
 
-            return new AnalysisReport(_grid.AsSolution(), _primaryConstraints, analyses);
+            return new ResolutionAnalysisReport(_grid.AsSolution(), _primaryConstraints, analyses);
         }
 
         public bool FindUniqueSolution(out SolutionGrid solution)

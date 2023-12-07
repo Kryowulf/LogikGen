@@ -12,7 +12,7 @@ using System.Windows.Threading;
 
 namespace WPFUI2.ViewModels
 {
-    public class ThreadSafeProgressViewModel : ViewModel
+    public class ProgressViewModel : ViewModel
     {
         private int _lastTotalProgress = 0;
         private DateTime _lastProgressUpdate = DateTime.Now;
@@ -78,26 +78,26 @@ namespace WPFUI2.ViewModels
             }
         }
 
-        public void UpdateReport(AnalysisReport report)
+        public void UpdateReport(GenerationAnalysisReport report)
         {
-            _lastReportSatisfied = Generator?.SatisfiesTargets(report) ?? false;
+            _lastReportSatisfied = report.AllTargetsSatisfied;
             string heading = _lastReportSatisfied ? "[SATISFIED]" : "[UNSATISFIED]";
 
-            this.ResultDisplay = heading + "\n" + report.Print();
+            this.ResultDisplay = heading + "\n" + report.PrintBrief();
         }
 
-        public void UpdateFinalReport(AnalysisReport report)
+        public void UpdateFinalReport(GenerationAnalysisReport report)
         {
-            _lastReportSatisfied = Generator?.SatisfiesTargets(report) ?? false;
+            _lastReportSatisfied = report.AllTargetsSatisfied;
             string heading = _lastReportSatisfied ? "[SATISFIED]" : "[UNSATISFIED]";
             
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine(heading);
-            sb.AppendLine(report.Print());
+            sb.AppendLine(report.PrintBrief());
 
-            PuzzleSolver solver = new PuzzleSolver(report.Solution.PropertySet, report.Analyses.Select(a => a.Strategy));
-            solver.AddConstraints(report.Constraints);
+            PuzzleSolver solver = new PuzzleSolver(report.ResolutionReport.Solution.PropertySet, report.ResolutionReport.Analyses.Select(a => a.Strategy));
+            solver.AddConstraints(report.ResolutionReport.Constraints);
 
             foreach (string step in solver.Explain(true))
                 sb.AppendLine(step);
@@ -110,7 +110,7 @@ namespace WPFUI2.ViewModels
             this.ResultDisplay = message;
         }
 
-        internal void UpdateUnsolvableResult(IList<Constraint> constraints)
+        internal void UpdateUnsolvableResult(IReadOnlyList<Constraint> constraints)
         {
             StringBuilder sb = new StringBuilder();
 

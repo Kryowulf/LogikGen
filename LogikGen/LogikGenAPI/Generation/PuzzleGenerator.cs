@@ -26,15 +26,6 @@ namespace LogikGenAPI.Generation
         public IReadOnlyList<ConstraintPattern> AvailablePatterns { get; private set; }
         public int MaxTotalConstraints { get; private set; }
 
-        // Each strategy has a target min & max number of applications. 
-        // Each constraint has a desired maximum count.
-        // + 1 for meeting the desired maximum total constraints.
-
-        public int MaxTargetScore => 
-            2 * this.StrategyTargets.Count 
-            + this.ConstraintTargets.Count 
-            + 1;
-
         public PuzzleGenerator(
             PropertySet pset, 
             int solutionSeed = -1)
@@ -178,8 +169,8 @@ namespace LogikGenAPI.Generation
             return wasTrimmed;
         }
 
-        public AnalysisReport FindSatisfyingPuzzle(
-            Action<AnalysisReport> newPuzzleCallback = null,
+        public GenerationAnalysisReport FindSatisfyingPuzzle(
+            Action<GenerationAnalysisReport> newPuzzleCallback = null,
             Action<int> searchProgressCallback = null,
             CancellationToken? cancelToken = null,
             int seed = -1)
@@ -190,7 +181,7 @@ namespace LogikGenAPI.Generation
             IList<Constraint> constraints = RandomPuzzle(rgen);     
             solver.AddConstraints(constraints);                     
                                                                     
-            AnalysisReport bestAnalysis = solver.FullAnalysis();
+            GenerationAnalysisReport bestAnalysis = MakeGenerationReport(solver.FullAnalysis());
             int totalPuzzlesSearched = 1;
 
             searchProgressCallback?.Invoke(totalPuzzlesSearched);
@@ -223,13 +214,13 @@ namespace LogikGenAPI.Generation
                 solver.ResetAll();
                 solver.AddConstraints(constraints);
 
-                AnalysisReport candidateAnalysis = solver.QuickAnalysis();
+                GenerationAnalysisReport candidateAnalysis = MakeGenerationReport(solver.QuickAnalysis());
 
-                if (SelectPreferred(bestAnalysis, candidateAnalysis) == candidateAnalysis)
+                if (candidateAnalysis.CompareTo(bestAnalysis) > 0)
                 {
-                    candidateAnalysis = solver.FullAnalysis();
+                    candidateAnalysis = MakeGenerationReport(solver.FullAnalysis());
 
-                    if (SelectPreferred(bestAnalysis, candidateAnalysis) == candidateAnalysis)
+                    if (candidateAnalysis.CompareTo(bestAnalysis) > 0)
                     {
                         bestAnalysis = candidateAnalysis;
                         newPuzzleCallback?.Invoke(bestAnalysis);
@@ -243,7 +234,7 @@ namespace LogikGenAPI.Generation
             return bestAnalysis;
         }
 
-        public IList<Constraint> FindUnsolvablePuzzle(
+        public UnsolvableAnalysisReport FindUnsolvablePuzzle(
             Action<int> searchProgressCallback = null,
             CancellationToken? cancelToken = null, 
             int unsolvableDepth = -1,
@@ -253,7 +244,6 @@ namespace LogikGenAPI.Generation
             PuzzleSolver solver = new PuzzleSolver(this.PropertySet, this.StrategyTargets.Select(t => t.Strategy));
             int totalPuzzlesSearched = 0;
             bool puzzleFound = false;
-            IList<Constraint> result = null;
 
             do
             {
@@ -293,7 +283,6 @@ namespace LogikGenAPI.Generation
                 {
                     if (unsolvableDepth < 0 || unsolvableDepth <= solver.FindUniqueSolutionSearchDepth())
                     {
-                        result = solver.Constraints.ToList();
                         puzzleFound = true;
                     }
                 }
@@ -304,68 +293,15 @@ namespace LogikGenAPI.Generation
             while (!puzzleFound &&
                     !cancelToken.GetValueOrDefault().IsCancellationRequested);
 
-            return result;
+            if (!puzzleFound)
+                return new UnsolvableAnalysisReport(solver.Strategies, this.Solution);
+            else
+                return new UnsolvableAnalysisReport(solver.Strategies, solver.Constraints.ToList(), this.Solution);
         }
 
-        public AnalysisReport SelectPreferred(AnalysisReport reportA, AnalysisReport reportB)
+        private GenerationAnalysisReport MakeGenerationReport(ResolutionAnalysisReport resolutionReport)
         {
-            int scoreA = CalculateTargetScore(reportA);
-            int scoreB = CalculateTargetScore(reportB);
-
-            if (scoreA > scoreB)
-                return reportA;
-
-            if (scoreB > scoreA)
-                return reportB;
-
-            if (reportB.CompareTo(reportA) > 0)
-                return reportB;
-
-            return reportA;
-        }
-
-        public bool SatisfiesTargets(AnalysisReport report)
-        {
-            return CalculateTargetScore(report) == this.MaxTargetScore;
-        }
-
-        public int CalculateTargetScore(AnalysisReport report)
-        {
-            int score = 0;
-
-            foreach (StrategyTarget target in this.StrategyTargets)
-            {
-                StrategyAnalysis analysis = report[target.Strategy];
-
-                if (analysis.ApplicationsNeeded >= target.MinApplications)
-                    score++;
-
-                if (analysis.ApplicationsNeeded <= target.MaxApplications)
-                    score++;
-            }
-
-            if (report.Constraints.Count <= this.MaxTotalConstraints)
-                score++;
-
-            Dictionary<Type, int> countsByConstraintType = new Dictionary<Type, int>();
-
-            foreach (Constraint c in report.Constraints)
-            {
-                Type t = c.GetType();
-
-                if (countsByConstraintType.ContainsKey(t))
-                    countsByConstraintType[t]++;
-                else
-                    countsByConstraintType[t] = 1;
-            }
-
-            foreach (ConstraintTarget t in this.ConstraintTargets)
-            {
-                if (countsByConstraintType.GetValueOrDefault(t.Pattern.ConstraintType, 0) <= t.MaxCount)
-                    score++;
-            }
-
-            return score;
+            return new GenerationAnalysisReport(resolutionReport, this.StrategyTargets, this.ConstraintTargets, this.MaxTotalConstraints);
         }
     }
 }

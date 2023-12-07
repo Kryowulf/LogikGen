@@ -145,22 +145,22 @@ namespace WPFUI2
 
                 if (_viewmodel.IsGenerateUnsolvableChecked)
                 {
-                    IList<Constraint>? constraints = await Task.Run(() => mpgen.FindUnsolvablePuzzle(
+                    UnsolvableAnalysisReport report = await Task.Run(() => mpgen.FindUnsolvablePuzzle(
                             _viewmodel.ProgressModel.UpdateSearchProgress, 
                             _cts.Token));
 
-                    if (constraints == null)
+                    if (report.IsCancelled)
                     {
                         _viewmodel.ProgressModel.ShowMessage("Cancelled");
                     }
                     else
                     {
-                        _viewmodel.ProgressModel.UpdateUnsolvableResult(constraints);
+                        _viewmodel.ProgressModel.UpdateUnsolvableResult(report.Constraints);
                     }
                 }
                 else
                 {
-                    AnalysisReport finalReport = await Task.Run(() => mpgen.FindSatisfyingPuzzle(
+                    GenerationAnalysisReport finalReport = await Task.Run(() => mpgen.FindSatisfyingPuzzle(
                         _viewmodel.ProgressModel.UpdateReport, 
                         _viewmodel.ProgressModel.UpdateSearchProgress, 
                         _cts?.Token));
