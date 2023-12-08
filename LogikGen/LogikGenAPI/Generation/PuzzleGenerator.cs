@@ -181,7 +181,7 @@ namespace LogikGenAPI.Generation
             IList<Constraint> constraints = RandomPuzzle(rgen);     
             solver.AddConstraints(constraints);                     
                                                                     
-            GenerationAnalysisReport bestAnalysis = MakeGenerationReport(solver.FullAnalysis());
+            GenerationAnalysisReport bestAnalysis = MakeGenerationReport(solver.FullAnalysis(), false);
             int totalPuzzlesSearched = 1;
 
             searchProgressCallback?.Invoke(totalPuzzlesSearched);
@@ -214,11 +214,11 @@ namespace LogikGenAPI.Generation
                 solver.ResetAll();
                 solver.AddConstraints(constraints);
 
-                GenerationAnalysisReport candidateAnalysis = MakeGenerationReport(solver.QuickAnalysis());
+                GenerationAnalysisReport candidateAnalysis = MakeGenerationReport(solver.QuickAnalysis(), false);
 
                 if (candidateAnalysis.CompareTo(bestAnalysis) > 0)
                 {
-                    candidateAnalysis = MakeGenerationReport(solver.FullAnalysis());
+                    candidateAnalysis = MakeGenerationReport(solver.FullAnalysis(), false);
 
                     if (candidateAnalysis.CompareTo(bestAnalysis) > 0)
                     {
@@ -231,7 +231,7 @@ namespace LogikGenAPI.Generation
                 searchProgressCallback?.Invoke(totalPuzzlesSearched);
             }
 
-            return bestAnalysis;
+            return MakeGenerationReport(bestAnalysis.ResolutionReport, true);
         }
 
         public UnsolvableAnalysisReport FindUnsolvablePuzzle(
@@ -299,9 +299,9 @@ namespace LogikGenAPI.Generation
                 return new UnsolvableAnalysisReport(solver.Strategies, solver.Constraints.ToList(), this.Solution);
         }
 
-        private GenerationAnalysisReport MakeGenerationReport(ResolutionAnalysisReport resolutionReport)
+        private GenerationAnalysisReport MakeGenerationReport(ResolutionAnalysisReport resolutionReport, bool isFinal)
         {
-            return new GenerationAnalysisReport(resolutionReport, this.StrategyTargets, this.ConstraintTargets, this.MaxTotalConstraints);
+            return new GenerationAnalysisReport(resolutionReport, this.StrategyTargets, this.ConstraintTargets, this.MaxTotalConstraints, isFinal);
         }
     }
 }

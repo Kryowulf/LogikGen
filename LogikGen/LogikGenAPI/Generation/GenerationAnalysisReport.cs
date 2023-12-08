@@ -19,6 +19,7 @@ namespace LogikGenAPI.Generation
         public IReadOnlyList<StrategyTarget> StrategyTargets { get; }
         public IReadOnlyList<ConstraintTarget> ConstraintTargets { get; }
         public int MaxTotalConstraints { get; }
+        public bool IsFinalReport { get; }
         public int MaximumScore { get; }
         public int Score { get; }
         public bool AllTargetsSatisfied { get; }
@@ -27,13 +28,15 @@ namespace LogikGenAPI.Generation
             ResolutionAnalysisReport resolutionReport,
             IReadOnlyList<StrategyTarget> strategyTargets,
             IReadOnlyList<ConstraintTarget> constraintTargets,
-            int maxTotalConstraints)
+            int maxTotalConstraints,
+            bool isFinal)
         {
             this.Timestamp = DateTime.Now;
             this.ResolutionReport = resolutionReport;
             this.StrategyTargets = strategyTargets;
             this.ConstraintTargets = constraintTargets;
             this.MaxTotalConstraints = maxTotalConstraints;
+            this.IsFinalReport = isFinal;
 
             // Each strategy has a target min & max number of applications. 
             // Each constraint has a desired maximum count.
@@ -109,8 +112,9 @@ namespace LogikGenAPI.Generation
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine("Puzzle Generated " + this.Timestamp.ToLongTimeString());
+            sb.AppendLine("Report Generated " + this.Timestamp.ToLongTimeString());
             sb.AppendLine(this.AllTargetsSatisfied ? "All Targets Satisfied" : "Some Targets Unsatisfied");
+            sb.AppendLine(this.IsFinalReport ? "Search Complete!" : "Search In Progress...");
             sb.AppendLine();
             PrintHeading(sb, "Constraints");
             sb.AppendLine();
@@ -146,18 +150,17 @@ namespace LogikGenAPI.Generation
             
             PrintHeading(sb, "Constraint Targets");
             sb.AppendLine();
-            sb.AppendLine("    Type                    Desired Maximum Count ");
-            sb.AppendLine("    --------------------    ------------------------");
-            sb.AppendLine();
+            sb.AppendLine("Type                    Desired Maximum Count ");
+            sb.AppendLine("--------------------    ------------------------");
 
             foreach (ConstraintTarget t in this.ConstraintTargets.OrderBy(t => t.Pattern.ConstraintType.Name))
             {
-                sb.Append(("    " + t.Pattern.ConstraintType.Name + ":").PadRight(28));
+                sb.Append((t.Pattern.ConstraintType.Name + ":").PadRight(24));
                 sb.AppendLine(t.MaxCount == int.MaxValue ? "No Limit" : t.MaxCount.ToString());
             }
 
             sb.AppendLine();
-            sb.Append("    Total:".PadRight(28));
+            sb.Append("Total:".PadRight(24));
             sb.AppendLine(this.MaxTotalConstraints == int.MaxValue ? "No Limit" : this.MaxTotalConstraints.ToString());
             sb.AppendLine();
 

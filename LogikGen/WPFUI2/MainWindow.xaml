@@ -112,9 +112,10 @@
                             <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding Path=IsGenerateUnsolvableChecked}">Unsolvable</CheckBox>
                         </Grid>
                     </GroupBox>
-                    <TextBlock Name="StatusOutput" HorizontalAlignment="Center" VerticalAlignment="Center"
-                               DataContext="{Binding Path=ProgressModel}"
-                               Text="{Binding Path=ProgressDisplay}" />
+                    <TextBlock DataContext="{Binding Path=ProgressModel}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Run Text="Total Generated: "/><Run Text="{Binding Path=TotalGenerated}" /><LineBreak/>
+                        <Run Text="Generation Speed: "/><Run Text="{Binding Path=GenerationSpeed}"/><Run Text="/sec"/>
+                    </TextBlock>
                 </DockPanel>
                 <GroupBox Header="Maximum Number of Constraints in Puzzle (blank signifies no limit)" HorizontalAlignment="Left" DockPanel.Dock="Bottom">
                     <UniformGrid Rows="3" Columns="6" Margin="5,5,5,5">

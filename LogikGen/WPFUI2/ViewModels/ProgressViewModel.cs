@@ -14,26 +14,32 @@ namespace WPFUI2.ViewModels
 {
     public class ProgressViewModel : ViewModel
     {
-        private int _lastTotalProgress = 0;
+        private int _lastTotalGenerated = 0;
         private DateTime _lastProgressUpdate = DateTime.Now;
-        private int _updateLock = 0;
+        private int _progressUpdateLock = 0;
 
-        public TimeSpan UpdateInterval { get; set; } = TimeSpan.FromMilliseconds(100);
+        public TimeSpan UpdateInterval { get; set; } = TimeSpan.FromMilliseconds(200);
+
+        // It is allowed to bind to properties that get updated from another thread.
+        // Due to the update lock, only one thread at a time will update these & raise OnPropertyChanged.
+        // Thus, binding to these should be okay but any codebehind shouldn't access them directly.
+        // There should be a better solution that doesn't involve blocking locks.
+
+        private int _totalGenerated;
+        public int TotalGenerated
+        {
+            get { return _totalGenerated; }
+            set { SetValue(ref _totalGenerated, value); }
+        }
 
 
-        // A stupid hack for now. 
-        // In order to tell whether an analysis report satisfies all generation targets,
-        // the instance of the generator that produced the report is needed.
-        // In the future, there'll be a ResolutionAnalysisReport and a GenerationAnalysisReport,
-        // where the latter will include the former along with information about
-        // which generation targets were satisfied.
-        private bool _lastReportSatisfied = false;
-        public PuzzleGenerator? Generator { get; set; }
+        private int _generationSpeed;
+        public int GenerationSpeed
+        {
+            get { return _generationSpeed; }
+            set { SetValue(ref _generationSpeed, value); }
+        }
 
-
-        // According to https://stackoverflow.com/questions/61119856/bindings-and-updating-from-another-thread
-        // it's legal to bind to properties that are updated from another thread.
-        // No need to fuss about with a Dispatcher.
 
         private string _resultDisplay = "";
         public string ResultDisplay
@@ -42,94 +48,51 @@ namespace WPFUI2.ViewModels
             set { SetValue(ref _resultDisplay, value); }
         }
 
-
-        private string _progressDisplay = "";
-        public string ProgressDisplay
-        {
-            get { return _progressDisplay; }
-            set { SetValue(ref _progressDisplay, value); }
-        }
-
-
         public void UpdateSearchProgress(int totalProgress, int taskId, int taskProgress)
         {
             // Non-blocking lock. If the current thread can't obtain the lock to do
             // a thread-safe progress update, then don't bother with it.
-            if (Interlocked.Exchange(ref _updateLock, 1) == 0)
+            if (Interlocked.Exchange(ref _progressUpdateLock, 1) == 0)
             {
                 if (DateTime.Now - _lastProgressUpdate >= UpdateInterval)
                 {
-                    if (_lastTotalProgress < totalProgress)
+                    if (_lastTotalGenerated < totalProgress)
                     {
-                        int progressDelta = totalProgress - _lastTotalProgress;
+                        int progressDelta = totalProgress - _lastTotalGenerated;
                         int timeDelta = (int)(DateTime.Now - _lastProgressUpdate).TotalMilliseconds;
-                        int speed = timeDelta == 0 ? -1 : (1000 * progressDelta / timeDelta);
-
-                        this.ProgressDisplay = $"Puzzles Searched: {totalProgress}\n" +
-                                               $"Speed: {speed}/sec\n" + 
-                                               (_lastReportSatisfied ? "[SATISFIED]" : "[UNSATISFIED]");
+                        this.GenerationSpeed = timeDelta == 0 ? -1 : (1000 * progressDelta / timeDelta);
+                        this.TotalGenerated = totalProgress;
                     }
 
-                    _lastTotalProgress = totalProgress;
+                    _lastTotalGenerated = totalProgress;
                     _lastProgressUpdate = DateTime.Now;
                 }
 
-                Interlocked.Exchange(ref _updateLock, 0);
+                Interlocked.Exchange(ref _progressUpdateLock, 0);
             }
         }
 
         public void UpdateReport(GenerationAnalysisReport report)
         {
-            _lastReportSatisfied = report.AllTargetsSatisfied;
-            string heading = _lastReportSatisfied ? "[SATISFIED]" : "[UNSATISFIED]";
+            // No need to lock here.
+            // MultithreadedPuzzleGenerator runs UpdateReport within a lock already.
 
-            this.ResultDisplay = heading + "\n" + report.PrintBrief();
+            this.ResultDisplay = report.PrintBrief();
         }
 
         public void UpdateFinalReport(GenerationAnalysisReport report)
         {
-            _lastReportSatisfied = report.AllTargetsSatisfied;
-            string heading = _lastReportSatisfied ? "[SATISFIED]" : "[UNSATISFIED]";
-            
-            StringBuilder sb = new StringBuilder();
+            this.ResultDisplay = report.PrintComplete();
+        }
 
-            sb.AppendLine(heading);
-            sb.AppendLine(report.PrintBrief());
-
-            PuzzleSolver solver = new PuzzleSolver(report.ResolutionReport.Solution.PropertySet, report.ResolutionReport.Analyses.Select(a => a.Strategy));
-            solver.AddConstraints(report.ResolutionReport.Constraints);
-
-            foreach (string step in solver.Explain(true))
-                sb.AppendLine(step);
-
-            this.ResultDisplay = sb.ToString();
+        public void UpdateUnsolvableReport(UnsolvableAnalysisReport report)
+        {
+            this.ResultDisplay = report.Print();
         }
 
         public void ShowMessage(string message)
         {
             this.ResultDisplay = message;
-        }
-
-        internal void UpdateUnsolvableResult(IReadOnlyList<Constraint> constraints)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.AppendLine(constraints.Count + " total constraints.");
-            sb.AppendLine(string.Join("\n", constraints.Select(c => c.ToString())));
-            sb.AppendLine();
-
-            if (this.Generator != null)
-            {
-                PuzzleSolver solver = new PuzzleSolver(Generator.PropertySet, Generator.StrategyTargets.Select(s => s.Strategy));
-                solver.AddConstraints(constraints);
-                solver.Resolve();
-
-                sb.AppendLine(GridPrinter.BuildGridString(solver.Grid));
-                sb.AppendLine();
-                sb.AppendLine(GridPrinter.BuildGridString(Generator.Solution));
-            }
-
-            this.ResultDisplay = sb.ToString();
         }
     }
 }

@@ -3,10 +3,12 @@ using LogikGenAPI.Generation;
 using LogikGenAPI.Model;
 using LogikGenAPI.Model.Constraints;
 using LogikGenAPI.Resolution;
+using LogikGenAPI.Resolution.Strategies;
 using LogikGenAPI.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -91,6 +93,7 @@ namespace WPFUI2
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             _cts?.Cancel();
+            OpenResultsWindow();
         }
 
         private void ViewResultsButton_Click(object sender, RoutedEventArgs e)
@@ -136,8 +139,6 @@ namespace WPFUI2
             MultithreadedPuzzleGenerator mpgen = new MultithreadedPuzzleGenerator(pgen);
             _cts = new CancellationTokenSource();
 
-            _viewmodel.ProgressModel.Generator = pgen;
-
             OpenResultsWindow();
 
             try
@@ -155,7 +156,7 @@ namespace WPFUI2
                     }
                     else
                     {
-                        _viewmodel.ProgressModel.UpdateUnsolvableResult(report.Constraints);
+                        _viewmodel.ProgressModel.UpdateUnsolvableReport(report);
                     }
                 }
                 else
@@ -211,17 +212,113 @@ namespace WPFUI2
 
         private void EasyButton_Click(object sender, RoutedEventArgs e)
         {
+            Dictionary<string, StrategyViewModel> svmByName = new Dictionary<string, StrategyViewModel>();
+
+            foreach (StrategyViewModel svm in _viewmodel.StrategyList)
+            {
+                svmByName[svm.Name] = svm;
+                svm.IsEnabled = false;
+                svm.MinimumApplications = 0;
+                svm.MaximumApplications = null;
+            }
+
+            // Enable only the most basic strategies.
+            // Don't require anything.
+
+            svmByName["SynchronizeStrategy"].IsEnabled = true;
+
+            svmByName["DistinctConstraintStrategy"].IsEnabled = true;
+            svmByName["EqualConstraintStrategy"].IsEnabled = true;
+            svmByName["IdentityConstraintStrategy"].IsEnabled = true;
+
+            svmByName["EitherOrImpliesDistinctStrategy"].IsEnabled = true;
+            svmByName["LessThanImpliesDistinctStrategy"].IsEnabled = true;
+            svmByName["NextToImpliesDistinctStrategy"].IsEnabled = true;
+
+            svmByName["EitherOrDomainStrategy"].IsEnabled = true;
+            svmByName["LessThanDomainStrategy"].IsEnabled = true;
+            svmByName["NextToDomainStrategy"].IsEnabled = true;
+
+            _viewmodel.ConstraintTargets.MaxIdentityConstraints = 1;
+
             MessageBox.Show("Strategies now configured for an overall easy puzzle.", "Difficulty Preset", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void MediumButton_Click(object sender, RoutedEventArgs e)
         {
+            Dictionary<string, StrategyViewModel> svmByName = new Dictionary<string, StrategyViewModel>();
+
+            foreach (StrategyViewModel svm in _viewmodel.StrategyList)
+            {
+                svmByName[svm.Name] = svm;
+                svm.IsEnabled = false;
+                svm.MinimumApplications = 0;
+                svm.MaximumApplications = null;
+            }
+
+            // Remove the "Equal" constraints since they give too much information.
+            // Enable all the typical strategies seen in "Zebra" puzzles.
+            // Require BlockCrossout and PropertyPairAnalysis.
+
+            svmByName["SynchronizeStrategy"].IsEnabled = true;
+
+            svmByName["DistinctConstraintStrategy"].IsEnabled = true;
+            svmByName["IdentityConstraintStrategy"].IsEnabled = true;
+
+            svmByName["EitherOrImpliesDistinctStrategy"].IsEnabled = true;
+            svmByName["LessThanImpliesDistinctStrategy"].IsEnabled = true;
+            svmByName["NextToImpliesDistinctStrategy"].IsEnabled = true;
+
+            svmByName["EitherOrArgumentUnionStrategy"].IsEnabled = true;
+            svmByName["EitherOrArgumentUnionStrategy"].MinimumApplications = 1;
+
+            svmByName["EitherOrDomainStrategy"].IsEnabled = true;
+            svmByName["LessThanDomainStrategy"].IsEnabled = true;
+            svmByName["NextToDomainStrategy"].IsEnabled = true;
+
+            svmByName["BlockCrossoutStrategy"].IsEnabled = true;
+            svmByName["BlockCrossoutStrategy"].MinimumApplications = 1;
+
+            svmByName["PropertyPairAnalysisStrategy"].IsEnabled = true;
+            svmByName["PropertyPairAnalysisStrategy"].MinimumApplications = 1;
+
+            svmByName["LessThanManyDomainStrategy/Direct"].IsEnabled = true;
+            svmByName["DoubleNextToImpliesBetweenStrategy/Direct"].IsEnabled = true;
+            svmByName["DoubleNextToImpliesEqualStrategy/Direct"].IsEnabled = true;
+
+            _viewmodel.ConstraintTargets.MaxEqualConstraints = 0;
+            _viewmodel.ConstraintTargets.MaxIdentityConstraints = 1;
+
             MessageBox.Show("Strategies now configured for an overall medium puzzle.", "Difficulty Preset", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void HardButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Strategies now configured for an overall difficult puzzle.", "Difficulty Preset", MessageBoxButton.OK, MessageBoxImage.Information);
+            Dictionary<string, StrategyViewModel> svmByName = new Dictionary<string, StrategyViewModel>();
+
+            foreach (StrategyViewModel svm in _viewmodel.StrategyList)
+            {
+                svmByName[svm.Name] = svm;
+                svm.IsEnabled = true;
+                svm.MinimumApplications = 0;
+                svm.MaximumApplications = null;
+            }
+
+            // Enable all strategies, except for the rather experimental constraint generation ones 
+            // since they drastically slow down the generator and can mess up difficulty measurements.
+
+            foreach (StrategyViewModel svm in _viewmodel.StrategyList)
+                if (svm.Name.Contains("ConstraintGenerationStrategy"))
+                    svm.IsEnabled = false;
+
+            // It's counterintuitive, but the best technique for generating the absolute hardest puzzles is to 
+            // give the generator free reign over puzzle selection. Don't force its hand by making certain
+            // strategies required.
+
+            _viewmodel.ConstraintTargets.MaxEqualConstraints = 0;
+            _viewmodel.ConstraintTargets.MaxIdentityConstraints = 1;
+
+            MessageBox.Show("Strategies now configured for an overall hard puzzle.", "Difficulty Preset", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

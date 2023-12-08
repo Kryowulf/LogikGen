@@ -5,7 +5,12 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Zebra.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Zebra.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\LogikGenAPI\LogikGenAPI.csproj" />

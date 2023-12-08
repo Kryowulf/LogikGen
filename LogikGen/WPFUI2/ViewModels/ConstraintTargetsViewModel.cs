@@ -8,15 +8,56 @@ using System.Threading.Tasks;
 
 namespace WPFUI2.ViewModels
 {
-    public class ConstraintTargetsViewModel
+    public class ConstraintTargetsViewModel : ViewModel
     {
-        public int? MaxTotalConstraints { get; set; }
-        public int? MaxEqualConstraints { get; set; }
-        public int? MaxDistinctConstraints { get; set; }
-        public int? MaxIdentityConstraints { get; set; }
-        public int? MaxLessThanConstraints { get; set; }
-        public int? MaxNextToConstraints { get; set; }
-        public int? MaxEitherOrConstraints { get; set; }
+        private int? _maxTotalConstraints;
+        public int? MaxTotalConstraints 
+        { 
+            get { return _maxTotalConstraints; }
+            set { SetValue(ref _maxTotalConstraints, value); }
+        }
+
+        private int? _maxEqualConstraints;
+        public int? MaxEqualConstraints 
+        { 
+            get { return _maxEqualConstraints; }
+            set { SetValue(ref _maxEqualConstraints, value); }
+        }
+
+        private int? _maxDistinctConstraints;
+        public int? MaxDistinctConstraints 
+        { 
+            get { return _maxDistinctConstraints; }
+            set { SetValue(ref _maxDistinctConstraints, value); }
+        }
+
+        private int? _maxIdentityConstraints;
+        public int? MaxIdentityConstraints 
+        { 
+            get { return _maxIdentityConstraints; }
+            set { SetValue(ref _maxIdentityConstraints, value); }
+        }
+
+        private int? _maxLessThanConstraints;
+        public int? MaxLessThanConstraints 
+        { 
+            get { return _maxLessThanConstraints; }
+            set { SetValue(ref _maxLessThanConstraints, value); }
+        }
+
+        private int? _maxNextToConstraints;
+        public int? MaxNextToConstraints 
+        { 
+            get { return _maxNextToConstraints; }
+            set { SetValue(ref _maxNextToConstraints, value); }
+        }
+
+        private int? _maxEitherOrConstraints;
+        public int? MaxEitherOrConstraints 
+        { 
+            get { return _maxEitherOrConstraints; }
+            set { SetValue(ref _maxEitherOrConstraints, value); }
+        }
 
         public IList<ConstraintTarget> BuildConstraintTargets()
         {
