@@ -170,10 +170,29 @@ namespace WPFUI2
                 }
 
             }
+            catch(UnderspecifiedGenerationException)
+            {
+                _viewmodel.ProgressModel.ShowMessage(
+                    "It is not possible to generate a puzzle given the selected settings.\n" + 
+                    "Please review the chosen constraint targets and enabled strategies.");
+
+                _cts.Cancel();
+            }
+            catch(GenerationException ex)
+            {
+                _viewmodel.ProgressModel.ShowMessage(
+                    "An unexpected error occurred in the generation process:\n" + 
+                    ex.Message + "\n\n" + 
+                    "Adjusting which strategies are enabled or disabled may resolve this.");
+
+                _cts.Cancel();
+            }
             catch(Exception ex)
             {
-                // Print the error information and cancel the search.
-                _viewmodel.ProgressModel.ShowMessage(ex.Message + "\n" + ex.StackTrace);
+                _viewmodel.ProgressModel.ShowMessage("An unexpected error occurred. Debugging information is printed below:\n\n" +
+                    ex.Message + "\n\n" + 
+                    ex.StackTrace);
+
                 _cts.Cancel();
             }
 

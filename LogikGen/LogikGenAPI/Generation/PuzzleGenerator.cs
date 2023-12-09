@@ -102,7 +102,7 @@ namespace LogikGenAPI.Generation
                 
                 // Unlikely to ever happen unless the generator was given stupid settings.
                 if (uselessConstraintCount >= USELESS_CONSTRAINT_THRESHOLD)
-                    throw new GenerationException("Unable to create a random puzzle due to insufficient generation parameters.");
+                    throw new UnderspecifiedGenerationException("Unable to create a random puzzle due to insufficient generation parameters.");
             }
 
 
