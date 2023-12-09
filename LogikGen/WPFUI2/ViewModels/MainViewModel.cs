@@ -27,6 +27,14 @@ namespace WPFUI2.ViewModels
         }
 
 
+        private bool _isCancelling;
+        public bool IsCancelling
+        {
+            get { return _isCancelling; }
+            set { SetValue(ref _isCancelling, value); }
+        }
+
+
         public MainViewModel()
         {
             this.ProgressModel = new ProgressViewModel();
@@ -35,6 +43,7 @@ namespace WPFUI2.ViewModels
             this.ConstraintTargets = new ConstraintTargetsViewModel();
             this.IsGenerateUnsolvableChecked = false;
             this.IsRunning = false;
+            this.IsCancelling = false;
 
             this.StrategyList = new DefaultStrategyList()
                                 .Select(s => new StrategyViewModel(s))

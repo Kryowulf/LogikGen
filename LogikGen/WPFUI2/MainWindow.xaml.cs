@@ -92,6 +92,7 @@ namespace WPFUI2
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            _viewmodel.IsCancelling = true;
             _cts?.Cancel();
             OpenResultsWindow();
         }
@@ -200,6 +201,7 @@ namespace WPFUI2
             _cts = null;
 
             _viewmodel.IsRunning = false;
+            _viewmodel.IsCancelling = false;
         }
 
         private void MainWindowTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
