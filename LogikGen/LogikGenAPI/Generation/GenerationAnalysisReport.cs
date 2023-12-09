@@ -1,4 +1,5 @@
 ﻿using LogikGenAPI.Generation.Patterns;
+using LogikGenAPI.Model;
 using LogikGenAPI.Model.Constraints;
 using LogikGenAPI.Resolution;
 using LogikGenAPI.Resolution.Strategies;
@@ -147,7 +148,20 @@ namespace LogikGenAPI.Generation
             StringBuilder sb = new StringBuilder();
 
             sb.Append(PrintBrief());
-            
+
+            PrintHeading(sb, "Categories & Properties");
+            sb.AppendLine();
+
+            foreach (Category c in this.ResolutionReport.Solution.PropertySet.Categories)
+            {
+                sb.AppendLine(c.Name + ":");
+
+                foreach (Property p in c.Properties)
+                    sb.AppendLine("    " + p.Name);
+
+                sb.AppendLine();
+            }
+
             PrintHeading(sb, "Constraint Targets");
             sb.AppendLine();
             sb.AppendLine("Type                    Desired Maximum Count ");

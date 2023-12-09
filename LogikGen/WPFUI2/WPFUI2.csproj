@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Zebra.ico</ApplicationIcon>
+    <AssemblyName>LogikGen</AssemblyName>
+    <StartupObject>WPFUI2.App</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
