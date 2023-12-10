@@ -108,6 +108,7 @@ namespace WPFUI2
                 _resultWindow = new ResultsWindow(this, _viewmodel.ProgressModel);
 
             _resultWindow.Show();
+            _resultWindow.WindowState = WindowState.Normal;
         }
 
         private async void RunGenerataor()
@@ -174,7 +175,7 @@ namespace WPFUI2
             catch(UnderspecifiedGenerationException)
             {
                 _viewmodel.ProgressModel.ShowMessage(
-                    "It is not possible to generate a puzzle given the selected settings.\n" + 
+                    "It is not possible to generate a puzzle fulfilling the selected settings.\n" + 
                     "Please review the chosen constraint targets and enabled strategies.");
 
                 _cts.Cancel();
@@ -260,7 +261,13 @@ namespace WPFUI2
             svmByName["LessThanDomainStrategy"].IsEnabled = true;
             svmByName["NextToDomainStrategy"].IsEnabled = true;
 
+            _viewmodel.ConstraintTargets.MaxTotalConstraints = null;
+            _viewmodel.ConstraintTargets.MaxEqualConstraints = null;
+            _viewmodel.ConstraintTargets.MaxDistinctConstraints = null;
             _viewmodel.ConstraintTargets.MaxIdentityConstraints = 1;
+            _viewmodel.ConstraintTargets.MaxLessThanConstraints = null;
+            _viewmodel.ConstraintTargets.MaxNextToConstraints = null;
+            _viewmodel.ConstraintTargets.MaxEitherOrConstraints = null;
 
             MessageBox.Show("Strategies now configured for an overall easy puzzle.", "Difficulty Preset", MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -307,8 +314,13 @@ namespace WPFUI2
             svmByName["DoubleNextToImpliesBetweenStrategy/Direct"].IsEnabled = true;
             svmByName["DoubleNextToImpliesEqualStrategy/Direct"].IsEnabled = true;
 
+            _viewmodel.ConstraintTargets.MaxTotalConstraints = null;
             _viewmodel.ConstraintTargets.MaxEqualConstraints = 0;
+            _viewmodel.ConstraintTargets.MaxDistinctConstraints = null;
             _viewmodel.ConstraintTargets.MaxIdentityConstraints = 1;
+            _viewmodel.ConstraintTargets.MaxLessThanConstraints = null;
+            _viewmodel.ConstraintTargets.MaxNextToConstraints = null;
+            _viewmodel.ConstraintTargets.MaxEitherOrConstraints = null;
 
             MessageBox.Show("Strategies now configured for an overall medium puzzle.", "Difficulty Preset", MessageBoxButton.OK, MessageBoxImage.Information);
         }
@@ -336,8 +348,13 @@ namespace WPFUI2
             // give the generator free reign over puzzle selection. Don't force its hand by making certain
             // strategies required.
 
+            _viewmodel.ConstraintTargets.MaxTotalConstraints = null;
             _viewmodel.ConstraintTargets.MaxEqualConstraints = 0;
+            _viewmodel.ConstraintTargets.MaxDistinctConstraints = null;
             _viewmodel.ConstraintTargets.MaxIdentityConstraints = 1;
+            _viewmodel.ConstraintTargets.MaxLessThanConstraints = null;
+            _viewmodel.ConstraintTargets.MaxNextToConstraints = null;
+            _viewmodel.ConstraintTargets.MaxEitherOrConstraints = null;
 
             MessageBox.Show("Strategies now configured for an overall hard puzzle.", "Difficulty Preset", MessageBoxButton.OK, MessageBoxImage.Information);
         }
