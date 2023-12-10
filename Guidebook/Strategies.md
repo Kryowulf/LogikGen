@@ -1,5 +1,5 @@
 
-# *LogikGen* Logic Puzzle Generator
+# ![Logo](Files/Logo.png) *LogikGen* Logic Puzzle Generator
 
 [Introduction](Introduction.md#logikgen-logic-puzzle-generator) - **Strategies** - [Generation Settings](GenerationSettings.md#logikgen-logic-puzzle-generator)
 
@@ -90,13 +90,17 @@ On the [Generation Settings](GeneratingSettings.md) window, you can control the 
 
 ## Strategies List
 
-The strategies currently recognized by LogikGen are as follows. Despite their admittedly cryptic names, these strategies were designed to mimic the kinds of deductions a person would make when solving Zebra puzzles by hand, in order to more accurately estimate the perceived difficulty of the puzzles. No brute force "guess and check" will ever be needed to solve a *LogikGen* puzzle.
+The strategies currently recognized by LogikGen are as follows. Despite their admittedly cryptic names, these strategies were designed to mimic the kinds of deductions a person would make when solving Zebra puzzles by hand, in order to more accurately estimate the perceived difficulty of the puzzles. 
+
+By default, generated puzzles are guaranteed to be solvable using only those strategies which have been enabled, so no "guess and check" will be needed. 
+
+There is an "Unsolvable" option to search for puzzles that have a unique solution, but otherwise cannot be solved using the enabled strategies. These may require brute force "guess and check". 
 
 - Grid Only
-    - [Synchronize Strategy](Strategies/SynchronizeStrategy.md)
-    - [Property Pair Analysis Strategy](Strategies/PropertyPairAnalysisStrategy.md)
     - [Block Crossout Strategy](Strategies/BlockCrossoutStrategy.md)
     - [Pigeonhole Strategy](Strategies/PigeonholeStrategy.md)
+    - [Property Pair Analysis Strategy](Strategies/PropertyPairAnalysisStrategy.md)
+    - [Synchronize Strategy](Strategies/SynchronizeStrategy.md)
 
 - Basic Assertion
     - [Distinct Constraint Strategy](Strategies/BasicAssertions.md)
@@ -104,11 +108,12 @@ The strategies currently recognized by LogikGen are as follows. Despite their ad
     - [Identity Constraint Strategy](Strategies/BasicAssertions.md)
     
 - Distinct Equivalent
+    - [EitherOr Implies Distinct Strategy](Strategies/DistinctEquivalent.md)
     - [LessThan Implies Distinct Strategy](Strategies/DistinctEquivalent.md)
     - [NextTo Implies Distinct Strategy](Strategies/DistinctEquivalent.md)
-    - [EitherOr Implies Distinct Strategy](Strategies/DistinctEquivalent.md)
 
 - Simple Domain
+    - [EitherOr Argument Union Strategy](Strategies/EitherOrArgumentUnionStrategy.md)
     - [EitherOr Domain Strategy](Strategies/EitherOrDomainStrategy.md)
     - [LessThan Domain Strategy](Strategies/LessThanDomainStrategy.md)
     - [LessThan-Many Domain Strategy](Strategies/LessThanManyDomainStrategy.md)
@@ -118,21 +123,19 @@ The strategies currently recognized by LogikGen are as follows. Despite their ad
     - [Double NextTo Implies Between Strategy](Strategies/DoubleNextToImpliesBetweenStrategy.md)
     - [Double NextTo Implies Equal Strategy](Strategies/DoubleNextToImpliesEqualStrategy.md)
     
-- Check Compatibility
+- Compatibility Check
     - [Immediate LessThan Compatibility Check Strategy](Strategies/ImmediateLessThanCompatibilityCheckStrategy.md)
     - [LessThan Many Compatibility Check Strategy](Strategies/LessThanManyCompatibilityCheckStrategy.md)
     - [NextTo Compatibility Check Strategy](Strategies/NextToCompatibilityCheckStrategy.md)
     - [NextTo Incompatibility Search Strategy](Strategies/NextToIncompatibilitySearchStrategy.md)
     
+- Binary Constraint Analysis    
+    - [Binary Constraint Analysis Strategy](Strategies/BinaryConstraintAnalysisStrategy.md)
+    
 - Constraint Generation
-    - [LessThan Transitive Constraint Generation Strategy](Strategies/LessThanTransitiveConstraintGenerationStrategy.md)
     - [EitherOr Transitive Constraint Generation Strategy](Strategies/EitherOrTransitiveConstraintGenerationStrategy.md)
     - [LessThan/NextTo Transitive Constraint Generation Strategy](Strategies/LessThanNextToTransitiveConstraintGenerationStrategy.md)
-    
-- Other
-    - [Binary Constraint Analysis Strategy](Strategies/BinaryConstraintAnalysisStrategy.md)
-    - [EitherOr Argument Union Strategy](Strategies/EitherOrArgumentUnionStrategy.md)
-
+    - [LessThan Transitive Constraint Generation Strategy](Strategies/LessThanTransitiveConstraintGenerationStrategy.md)
 
 ## The Paradox of Too Many Strategies
 

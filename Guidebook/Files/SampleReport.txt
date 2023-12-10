@@ -1,0 +1,567 @@
+Report Generated 10:21:35 AM
+All Targets Satisfied
+Search Complete!
+
++--------------------------------------------------------------+
+|                         Constraints                          |
++--------------------------------------------------------------+
+
+6 total constraints.
+
+EitherOr(Fox, 4th, Green)
+EitherOr(Snails, Englishman, Yellow)
+Equal(Blue, 3rd)
+Identity(Dog, Spaniard, Blue, 4th)
+LessThan:Location(Red, Ukrainian)
+NextTo:Location(Green, Ukrainian)
+
++--------------------------------------------------------------+
+|                     Strategies Required                      |
++--------------------------------------------------------------+
+
+EitherOrDomainStrategy (Medium)
+2 application(s) needed.
+
+EitherOrImpliesDistinctStrategy (Easy)
+1 application(s) needed.
+
+EqualConstraintStrategy (Easiest)
+1 application(s) needed.
+
+IdentityConstraintStrategy (Easiest)
+1 application(s) needed.
+
+LessThanDomainStrategy (Medium)
+1 application(s) needed.
+
+LessThanImpliesDistinctStrategy (Easy)
+1 application(s) needed.
+
+NextToDomainStrategy (Medium)
+2 application(s) needed.
+
+NextToImpliesDistinctStrategy (Easy)
+1 application(s) needed.
+
+SynchronizeStrategy (Easy)
+3 application(s) needed.
+
++--------------------------------------------------------------+
+|                   Categories & Properties                    |
++--------------------------------------------------------------+
+
+Location:
+    1st
+    2nd
+    3rd
+    4th
+
+Nationality:
+    Englishman
+    Spaniard
+    Ukrainian
+    Norwegian
+
+Color:
+    Red
+    Green
+    Blue
+    Yellow
+
+Pet:
+    Dog
+    Fox
+    Zebra
+    Snails
+
++--------------------------------------------------------------+
+|                      Constraint Targets                      |
++--------------------------------------------------------------+
+
+Type                    Desired Maximum Count 
+--------------------    ------------------------
+DistinctConstraint:     No Limit
+EitherOrConstraint:     2
+EqualConstraint:        No Limit
+IdentityConstraint:     1
+LessThanConstraint:     No Limit
+NextToConstraint:       No Limit
+
+Total:                  6
+
++--------------------------------------------------------------+
+|                      Enabled Strategies                      |
++--------------------------------------------------------------+
+
+DistinctConstraintStrategy (Easiest)
+Applications Desired:   Minimum: 0      Maximum: No Limit
+
+EitherOrDomainStrategy (Medium)
+Applications Desired:   Minimum: 0      Maximum: No Limit
+
+EitherOrImpliesDistinctStrategy (Easy)
+Applications Desired:   Minimum: 0      Maximum: No Limit
+
+EqualConstraintStrategy (Easiest)
+Applications Desired:   Minimum: 0      Maximum: No Limit
+
+IdentityConstraintStrategy (Easiest)
+Applications Desired:   Minimum: 0      Maximum: No Limit
+
+LessThanDomainStrategy (Medium)
+Applications Desired:   Minimum: 0      Maximum: No Limit
+
+LessThanImpliesDistinctStrategy (Easy)
+Applications Desired:   Minimum: 0      Maximum: No Limit
+
+NextToDomainStrategy (Medium)
+Applications Desired:   Minimum: 0      Maximum: No Limit
+
+NextToImpliesDistinctStrategy (Easy)
+Applications Desired:   Minimum: 0      Maximum: No Limit
+
+SynchronizeStrategy (Easy)
+Applications Desired:   Minimum: 0      Maximum: No Limit
+
++--------------------------------------------------------------+
+|                           Solution                           |
++--------------------------------------------------------------+
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|O...|O...|O...|
+2nd       |.O..|.O..|.O..|.O..|
+3rd       |..O.|..O.|..O.|..O.|
+4th       |...O|...O|...O|...O|
+-------------------------------
+Englishman|O...|O...|O...|O...|
+Spaniard  |.O..|.O..|.O..|.O..|
+Ukrainian |..O.|..O.|..O.|..O.|
+Norwegian |...O|...O|...O|...O|
+-------------------------------
+Red       |O...|O...|O...|O...|
+Green     |.O..|.O..|.O..|.O..|
+Blue      |..O.|..O.|..O.|..O.|
+Yellow    |...O|...O|...O|...O|
+-------------------------------
+Dog       |O...|O...|O...|O...|
+Fox       |.O..|.O..|.O..|.O..|
+Zebra     |..O.|..O.|..O.|..O.|
+Snails    |...O|...O|...O|...O|
+-------------------------------
+
+
+-----------------------------------------------------
+|    1st     |    2nd     |    3rd     |    4th     |
+| Englishman |  Spaniard  | Ukrainian  | Norwegian  |
+|    Red     |   Green    |    Blue    |   Yellow   |
+|    Dog     |    Fox     |   Zebra    |   Snails   |
+-----------------------------------------------------
+
+
++--------------------------------------------------------------+
+|                         How To Solve                         |
++--------------------------------------------------------------+
+
+[EqualConstraintStrategy] Equal(Blue, 3rd)
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|    |  . |    |
+2nd       |.O..|    |  . |    |
+3rd       |..O.|    |..O.|    |
+4th       |...O|    |  . |    |
+-------------------------------
+Englishman|    |O...|    |    |
+Spaniard  |    |.O..|    |    |
+Ukrainian |    |..O.|    |    |
+Norwegian |    |...O|    |    |
+-------------------------------
+Red       |  . |    |O...|    |
+Green     |  . |    |.O..|    |
+Blue      |..O.|    |..O.|    |
+Yellow    |  . |    |...O|    |
+-------------------------------
+Dog       |    |    |    |O...|
+Fox       |    |    |    |.O..|
+Zebra     |    |    |    |..O.|
+Snails    |    |    |    |...O|
+-------------------------------
+
+[IdentityConstraintStrategy] Identity(Dog, Spaniard, Blue, 4th)
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|    |  . |    |
+2nd       |.O..|    |  . |    |
+3rd       |..O.|    |..O.|    |
+4th       |...O| .  |  . |.   |
+-------------------------------
+Englishman|    |O...|    |    |
+Spaniard  |   .|.O..|  . |.   |
+Ukrainian |    |..O.|    |    |
+Norwegian |    |...O|    |    |
+-------------------------------
+Red       |  . |    |O...|    |
+Green     |  . |    |.O..|    |
+Blue      |..O.| .  |..O.|.   |
+Yellow    |  . |    |...O|    |
+-------------------------------
+Dog       |   .| .  |  . |O...|
+Fox       |    |    |    |.O..|
+Zebra     |    |    |    |..O.|
+Snails    |    |    |    |...O|
+-------------------------------
+
+[EitherOrImpliesDistinctStrategy] EitherOr(Snails, Englishman, Yellow)
+[EitherOrImpliesDistinctStrategy] EitherOr(Fox, 4th, Green)
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|    |  . |    |
+2nd       |.O..|    |  . |    |
+3rd       |..O.|    |..O.|    |
+4th       |...O| .  | .. |.   |
+-------------------------------
+Englishman|    |O...|   .|    |
+Spaniard  |   .|.O..|  . |.   |
+Ukrainian |    |..O.|    |    |
+Norwegian |    |...O|    |    |
+-------------------------------
+Red       |  . |    |O...|    |
+Green     |  ..|    |.O..|    |
+Blue      |..O.| .  |..O.|.   |
+Yellow    |  . |.   |...O|    |
+-------------------------------
+Dog       |   .| .  |  . |O...|
+Fox       |    |    |    |.O..|
+Zebra     |    |    |    |..O.|
+Snails    |    |    |    |...O|
+-------------------------------
+
+[LessThanImpliesDistinctStrategy] LessThan:Location(Red, Ukrainian)
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|    |  . |    |
+2nd       |.O..|    |  . |    |
+3rd       |..O.|    |..O.|    |
+4th       |...O| .  | .. |.   |
+-------------------------------
+Englishman|    |O...|   .|    |
+Spaniard  |   .|.O..|  . |.   |
+Ukrainian |    |..O.|.   |    |
+Norwegian |    |...O|    |    |
+-------------------------------
+Red       |  . |  . |O...|    |
+Green     |  ..|    |.O..|    |
+Blue      |..O.| .  |..O.|.   |
+Yellow    |  . |.   |...O|    |
+-------------------------------
+Dog       |   .| .  |  . |O...|
+Fox       |    |    |    |.O..|
+Zebra     |    |    |    |..O.|
+Snails    |    |    |    |...O|
+-------------------------------
+
+[NextToImpliesDistinctStrategy] NextTo:Location(Green, Ukrainian)
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|    |  . |    |
+2nd       |.O..|    |  . |    |
+3rd       |..O.|    |..O.|    |
+4th       |...O| .  | .. |.   |
+-------------------------------
+Englishman|    |O...|   .|    |
+Spaniard  |   .|.O..|  . |.   |
+Ukrainian |    |..O.|..  |    |
+Norwegian |    |...O|    |    |
+-------------------------------
+Red       |  . |  . |O...|    |
+Green     |  ..|  . |.O..|    |
+Blue      |..O.| .  |..O.|.   |
+Yellow    |  . |.   |...O|    |
+-------------------------------
+Dog       |   .| .  |  . |O...|
+Fox       |    |    |    |.O..|
+Zebra     |    |    |    |..O.|
+Snails    |    |    |    |...O|
+-------------------------------
+
+[SynchronizeStrategy] Resolved 4 associations.
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|    |  . |    |
+2nd       |.O..|    |  . |    |
+3rd       |..O.| .  |..O.|.   |
+4th       |...O| .  | .. |.   |
+-------------------------------
+Englishman|    |O...|   .|    |
+Spaniard  |  ..|.O..|  . |.   |
+Ukrainian |    |..O.|..  |    |
+Norwegian |    |...O|    |    |
+-------------------------------
+Red       |  . |  . |O...|    |
+Green     |  ..|  . |.O..|    |
+Blue      |..O.| .  |..O.|.   |
+Yellow    |  . |.   |...O|    |
+-------------------------------
+Dog       |  ..| .  |  . |O...|
+Fox       |    |    |    |.O..|
+Zebra     |    |    |    |..O.|
+Snails    |    |    |    |...O|
+-------------------------------
+
+[LessThanDomainStrategy] LessThan:Location(Red, Ukrainian) -> Ukrainian = {2nd, 3rd, 4th}
+[LessThanDomainStrategy] LessThan:Location(Red, Ukrainian) -> Red = {1st, 2nd}
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|  . |  ..|    |
+2nd       |.O..|    |  ..|    |
+3rd       |..O.| .  |..O.|.   |
+4th       |...O| .  |...O|.   |
+-------------------------------
+Englishman|    |O...|   .|    |
+Spaniard  |  ..|.O..|  . |.   |
+Ukrainian |.   |..O.|..  |    |
+Norwegian |    |...O|    |    |
+-------------------------------
+Red       |  ..|  . |O...|    |
+Green     |  ..|  . |.O..|    |
+Blue      |..O.| .  |..O.|.   |
+Yellow    |...O|.   |...O|    |
+-------------------------------
+Dog       |  ..| .  |  . |O...|
+Fox       |    |    |    |.O..|
+Zebra     |    |    |    |..O.|
+Snails    |    |    |    |...O|
+-------------------------------
+
+[SynchronizeStrategy] Resolved 6 associations.
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|  . |  ..|    |
+2nd       |.O..|    |  ..|    |
+3rd       |..O.| .  |..O.|.   |
+4th       |...O|..  |...O|.   |
+-------------------------------
+Englishman|   .|O...|   .|    |
+Spaniard  |  ..|.O..|  ..|.   |
+Ukrainian |.   |..O.|..  |    |
+Norwegian |    |...O|    |    |
+-------------------------------
+Red       |  ..|  . |O...|    |
+Green     |  ..|  . |.O..|    |
+Blue      |..O.| .  |..O.|.   |
+Yellow    |...O|..  |...O|.   |
+-------------------------------
+Dog       |  ..| .  |  ..|O...|
+Fox       |    |    |    |.O..|
+Zebra     |    |    |    |..O.|
+Snails    |    |    |    |...O|
+-------------------------------
+
+[NextToDomainStrategy] NextTo:Location(Green, Ukrainian) -> Ukrainian = {2nd, 3rd}
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|  ..|  ..|    |
+2nd       |.O..|   .|  ..|    |
+3rd       |..O.| . .|..O.|.   |
+4th       |...O|...O|...O|.   |
+-------------------------------
+Englishman|   .|O...|   .|    |
+Spaniard  |  ..|.O..|  ..|.   |
+Ukrainian |.  .|..O.|..  |    |
+Norwegian |...O|...O|    |    |
+-------------------------------
+Red       |  ..|  . |O...|    |
+Green     |  ..|  . |.O..|    |
+Blue      |..O.| .  |..O.|.   |
+Yellow    |...O|..  |...O|.   |
+-------------------------------
+Dog       |  ..| .  |  ..|O...|
+Fox       |    |    |    |.O..|
+Zebra     |    |    |    |..O.|
+Snails    |    |    |    |...O|
+-------------------------------
+
+[SynchronizeStrategy] Resolved 32 associations.
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|  ..|  ..|    |
+2nd       |.O..|  ..|  ..|    |
+3rd       |..O.|..O.|..O.|.   |
+4th       |...O|...O|...O|.   |
+-------------------------------
+Englishman|  ..|O...|  ..|O...|
+Spaniard  |  ..|.O..|  ..|.   |
+Ukrainian |..O.|..O.|..O.|.   |
+Norwegian |...O|...O|...O|.   |
+-------------------------------
+Red       |  ..|  ..|O...|    |
+Green     |  ..|  ..|.O..|    |
+Blue      |..O.|..O.|..O.|.   |
+Yellow    |...O|...O|...O|.   |
+-------------------------------
+Dog       |  ..|O...|  ..|O...|
+Fox       |    |.   |    |.O..|
+Zebra     |    |.   |    |..O.|
+Snails    |    |.   |    |...O|
+-------------------------------
+
+[EitherOrDomainStrategy] Snails = Yellow
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|  ..|  ..|    |
+2nd       |.O..|  ..|  ..|    |
+3rd       |..O.|..O.|..O.|.   |
+4th       |...O|...O|...O|.   |
+-------------------------------
+Englishman|  ..|O...|  ..|O...|
+Spaniard  |  ..|.O..|  ..|.   |
+Ukrainian |..O.|..O.|..O.|.   |
+Norwegian |...O|...O|...O|.   |
+-------------------------------
+Red       |  ..|  ..|O...|   .|
+Green     |  ..|  ..|.O..|   .|
+Blue      |..O.|..O.|..O.|.  .|
+Yellow    |...O|...O|...O|...O|
+-------------------------------
+Dog       |  ..|O...|  ..|O...|
+Fox       |    |.   |   .|.O..|
+Zebra     |    |.   |   .|..O.|
+Snails    |    |.   |...O|...O|
+-------------------------------
+
+[SynchronizeStrategy] Resolved 22 associations.
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|  ..|  ..|   .|
+2nd       |.O..|  ..|  ..|   .|
+3rd       |..O.|..O.|..O.|.  .|
+4th       |...O|...O|...O|...O|
+-------------------------------
+Englishman|  ..|O...|  ..|O...|
+Spaniard  |  ..|.O..|  ..|.  .|
+Ukrainian |..O.|..O.|..O.|.  .|
+Norwegian |...O|...O|...O|...O|
+-------------------------------
+Red       |  ..|  ..|O...|   .|
+Green     |  ..|  ..|.O..|   .|
+Blue      |..O.|..O.|..O.|.  .|
+Yellow    |...O|...O|...O|...O|
+-------------------------------
+Dog       |  ..|O...|  ..|O...|
+Fox       |   .|.  .|   .|.O..|
+Zebra     |   .|.  .|   .|..O.|
+Snails    |...O|...O|...O|...O|
+-------------------------------
+
+[EitherOrDomainStrategy] Fox = Green
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|  ..|  ..|   .|
+2nd       |.O..|  ..|  ..|   .|
+3rd       |..O.|..O.|..O.|.  .|
+4th       |...O|...O|...O|...O|
+-------------------------------
+Englishman|  ..|O...|  ..|O...|
+Spaniard  |  ..|.O..|  ..|.  .|
+Ukrainian |..O.|..O.|..O.|.  .|
+Norwegian |...O|...O|...O|...O|
+-------------------------------
+Red       |  ..|  ..|O...|O...|
+Green     |  ..|  ..|.O..|.O..|
+Blue      |..O.|..O.|..O.|..O.|
+Yellow    |...O|...O|...O|...O|
+-------------------------------
+Dog       |  ..|O...|O...|O...|
+Fox       |   .|.  .|.O..|.O..|
+Zebra     |   .|.  .|..O.|..O.|
+Snails    |...O|...O|...O|...O|
+-------------------------------
+
+[SynchronizeStrategy] Resolved 24 associations.
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|  ..|  ..|  ..|
+2nd       |.O..|  ..|  ..|  ..|
+3rd       |..O.|..O.|..O.|..O.|
+4th       |...O|...O|...O|...O|
+-------------------------------
+Englishman|  ..|O...|O...|O...|
+Spaniard  |  ..|.O..|.O..|.O..|
+Ukrainian |..O.|..O.|..O.|..O.|
+Norwegian |...O|...O|...O|...O|
+-------------------------------
+Red       |  ..|O...|O...|O...|
+Green     |  ..|.O..|.O..|.O..|
+Blue      |..O.|..O.|..O.|..O.|
+Yellow    |...O|...O|...O|...O|
+-------------------------------
+Dog       |  ..|O...|O...|O...|
+Fox       |  ..|.O..|.O..|.O..|
+Zebra     |..O.|..O.|..O.|..O.|
+Snails    |...O|...O|...O|...O|
+-------------------------------
+
+[NextToDomainStrategy] NextTo:Location(Green, Ukrainian) -> Green = {2nd}
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|  ..|O...|  ..|
+2nd       |.O..|  ..|.O..|  ..|
+3rd       |..O.|..O.|..O.|..O.|
+4th       |...O|...O|...O|...O|
+-------------------------------
+Englishman|  ..|O...|O...|O...|
+Spaniard  |  ..|.O..|.O..|.O..|
+Ukrainian |..O.|..O.|..O.|..O.|
+Norwegian |...O|...O|...O|...O|
+-------------------------------
+Red       |O...|O...|O...|O...|
+Green     |.O..|.O..|.O..|.O..|
+Blue      |..O.|..O.|..O.|..O.|
+Yellow    |...O|...O|...O|...O|
+-------------------------------
+Dog       |  ..|O...|O...|O...|
+Fox       |  ..|.O..|.O..|.O..|
+Zebra     |..O.|..O.|..O.|..O.|
+Snails    |...O|...O|...O|...O|
+-------------------------------
+
+[SynchronizeStrategy] Resolved 16 associations.
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|O...|O...|O...|
+2nd       |.O..|.O..|.O..|.O..|
+3rd       |..O.|..O.|..O.|..O.|
+4th       |...O|...O|...O|...O|
+-------------------------------
+Englishman|O...|O...|O...|O...|
+Spaniard  |.O..|.O..|.O..|.O..|
+Ukrainian |..O.|..O.|..O.|..O.|
+Norwegian |...O|...O|...O|...O|
+-------------------------------
+Red       |O...|O...|O...|O...|
+Green     |.O..|.O..|.O..|.O..|
+Blue      |..O.|..O.|..O.|..O.|
+Yellow    |...O|...O|...O|...O|
+-------------------------------
+Dog       |O...|O...|O...|O...|
+Fox       |.O..|.O..|.O..|.O..|
+Zebra     |..O.|..O.|..O.|..O.|
+Snails    |...O|...O|...O|...O|
+-------------------------------
+

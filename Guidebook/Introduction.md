@@ -1,5 +1,5 @@
 
-# *LogikGen* Logic Puzzle Generator
+# ![Logo](Files/Logo.png) *LogikGen* Logic Puzzle Generator
 
 **Introduction** - [Strategies](Strategies.md#logikgen-logic-puzzle-generator) - [Generation Settings](GenerationSettings.md#logikgen-logic-puzzle-generator)
 
@@ -83,38 +83,40 @@ To generate a basic puzzle, follow the steps below:
 
 ### Step 1
 
-Select the desired size of your puzzle and type in all of its categories and properties. Any categories marked "Is Ordered" will have `LessThan` and `NextTo` constraints generated for them (e.g, *"The Norwegian lives next to the blue house"*).
+Select the desired size of your puzzle and type in all of its categories and properties. Any categories marked as "Ordered" will have `LessThan` and `NextTo` constraints generated for them (e.g, *"The Norwegian lives next to the blue house"*).
 
-![Puzzle Definition Window](Files/DefinitionWindow.png)  
+![Puzzle Definition Tab](Files/DefinitionTab.png)  
 **Figure 4 - Define Your Puzzle**
 
 ### Step 2
 
-Select the desired final solution of the puzzle, or pick a randomized solution. 
+Select the desired final solution for the puzzle, or pick a randomized solution. 
 
-![Puzzle Solution Window](Files/SolutionWindow.png)  
-**Figure 5 - Enter the Desired Solution**
+![Puzzle Solution Tab](Files/SolutionTab.png)  
+**Figure 5 - Select the Desired Solution**
 
 ### Step 3
 
-There are many available settings, the details of which can be reviewed in the [Generation Settings](GenerationSettings.md) and [Strategies](Strategies.md) guides. For now, just click the "Generate" button, wait ten seconds, then click the "Cancel" button. The program will continually search for better & more difficult puzzles the longer you keep it running.
+There are many available settings, the details of which can be reviewed in the [Generation Settings](GenerationSettings.md) and [Strategies](Strategies.md) guides. For now, just click the **Easy** preset followed by the **Start** button, wait a few seconds, then click the **Stop** button. The program will continually search for better & more difficult puzzles the longer you keep it running.
 
-![Generation Window](Files/GenerationWindow.png)  
+![Generation Tab](Files/GenerationTab.png)  
 **Figure 6 - Puzzle Generation Settings**
 
-![Generation Window Searching](Files/GenerationWindowSearching.png)  
+![Generation Tab](Files/GenerationTabSearching.png)  
 **Figure 7 - The Generator is Running**
 
-![Generation Window Done](Files/GenerationWindowDone.png)
+![Results Window](Files/ResultsWindow.png)
 **Figure 8 - Puzzle Generation Complete**
 
-*LogikGen* will, by default, use all available cores of your CPU to search for good puzzles. It accomplishes this by launching several threads which run in parallel, the progress of which can be seen on the sidebar to the right. 
+*LogikGen* will use all available cores of your CPU to search for good puzzles. 
 
 When the Cancel button is clicked, a great deal of information about your newly generated puzzle will be printed:
 
 - The clues for your puzzle in *LogikGen*'s constraint notation. See the [Strategies](Strategies.md#terminology) guide for information about how to interpret these constraints.
 - A listing of the minimum number of times each strategy must be applied in order to solve the puzzle, which is used for ranking its difficulty.
-- The completed grid and solution.
+- A listing of the puzzle's categories and properties, needed for making a grid.
+- The selected constraint & strategy settings.
+- The puzzle's solution.
 - A log of the detailed step-by-step deductions you can take to reach the solution.
 
 ---

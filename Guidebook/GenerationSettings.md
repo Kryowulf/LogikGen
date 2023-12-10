@@ -1,5 +1,5 @@
 
-# *LogikGen* Logic Puzzle Generator
+# ![Logo](Files/Logo.png) *LogikGen* Logic Puzzle Generator
 
 [Introduction](Introduction.md#logikgen-logic-puzzle-generator) - [Strategies](Strategies.md#logikgen-logic-puzzle-generator) - **Generation Settings**
 
@@ -10,13 +10,13 @@
 - [Overview](#overview)
 - [Heading](#heading)
 - [Per-Strategy Settings](#per-strategy-settings)
-- [Maximum Constraint Counts](#maximum-constraint-counts)
-- [Interpreting the Output](#interpreting-the-output)
-- [Suggested Settings](#suggested-settings)
+- [Maximum Number of Constraints](#maximum-number-of-constraints)
+- [Results](#results)
+- [Unsolvable results](#unsolvable-results)
 
 ## Overview
 
-The *Generation* window of *LogikGen* contains many settings allowing you to fine-tune the resulting puzzle. 
+The *Generation* tab of *LogikGen* contains many settings allowing you to fine-tune the resulting puzzle. 
 
 It is perfectly fine to leave all settings on their default values, in which case the generator will create puzzles with no restrictions at all on the number of constraints or the types of strategies needed to solve them. Simply click the *Generate* button, wait 10 seconds, then click the *Cancel* button. The most difficult puzzle found within those 10 seconds will then be printed. 
 
@@ -24,21 +24,15 @@ The longer you leave *LogikGen* running, the more challenging the resulting puzz
 
 The purpose of each setting is discussed below. 
 
-![Generation Window](Files/GenerationWindow.png)
+![Generation Tab](Files/GenerationTab.png)
 
 ## Heading
 
+- Presets  
+    Predefined settings for generating Easy, Medium, and Hard puzzles respectively. The *Medium* setting is most simliar to the traditional Zebra puzzle in regards to difficulty.
+
 - Unsolvable  
-    Applies a brute-force search to find a puzzle that is guaranteed to have a unique solution, but which none of the strategies listed can solve. Such puzzles will require a "guess and check" approach to solve. Note that this is a great way to discover new strategies!
-    
-- Depth  
-    If *Unsolvable* is checked, this controls the minimum number of levels of guess-and-check that will be required in order to solve the puzzle. No puzzle has been found yet, however, that requires a guess-and-check depth of 2 or more. Keeping this setting blank will improve running time, since analyzing a puzzle for its minimum guess-and-check depth is an expensive operation. 
-    
-- Seed  
-    Seeds the random number generator used to search for random puzzles. This does not guarantee the same puzzle will result, however, since that also depends on when the Cancel button is clicked. This setting is mostly used to consistently test the generator.
-    
-- \#Threads  
-    If left blank, the generator will use all available cores & hardware threads on your CPU. Use this to control the number of threads that will search in parallel for puzzles.
+    Applies a brute-force search to find a puzzle that is guaranteed to have a unique solution, but which none of the enabled strategies can solve. Such puzzles may require you to use a "guess and check" approach. Note that this is a great way to discover new strategies!
     
 ## Per-Strategy Settings
 
@@ -53,174 +47,145 @@ The purpose of each setting is discussed below.
 
     **Setting `Max` to 0 is not the same as disabling the strategy!** It is common for a situation to arise where two different strategies could be applied to yield the same conclusions. The first strategy won't be counted as required if the second strategy could be used instead to solve the puzzle. Similarly, the second strategy won't be counted as required if the first could be used instead to solve the puzzle. 
     
-    In other words, a puzzle may require at least one of the two strategies to solve, even if neither strategy on its own is required. In such a situation, disabling both strategies would cause the puzzle to be flagged as "unsolvable".
+    In other words, a puzzle may require at least one of the two strategies to solve, even if neither strategy on its own is required. Such puzzles will be misleadingly rated as easier than they really are.
     
-## Maximum Constraint Counts
+## Maximum Number of Constraints
 
 Since *LogikGen* puzzles are random, it can often happen that the final puzzle it chooses contains nothing but *LessThan* constraints, or nothing but *EitherOr* constraints. Such puzzles aren't very fun. You can influence the proportion and amount of each type of constraint by setting their desired maximum counts.
 
 - Total  
-    The generator will only select puzzles which have no more than this number of constraints in total.
+    The generator will prefer puzzles which have no more than this number of constraints in total.
     
 - Equal  
-    The generator will only select puzzles which have no more than this number of `Equal` constraints. 
+    The generator will prefer puzzles which have no more than this number of `Equal` constraints. 
     
 - Distinct  
-    The generator will only select puzzles which have no more than this number of `Distinct` constraints. 
+    The generator will prefer puzzles which have no more than this number of `Distinct` constraints. 
     
 - Identity  
-    The generator will only select puzzles which have no more than this number of `Identity` constraints. 
+    The generator will prefer puzzles which have no more than this number of `Identity` constraints. 
 
 - Less Than  
-    The generator will only select puzzles which have no more than this number of `LessThan` constraints
+    The generator will prefer puzzles which have no more than this number of `LessThan` constraints
     
 - Next To  
-    The generator will only select puzzles which have no more than this number of `NextTo` constraints.
+    The generator will prefer puzzles which have no more than this number of `NextTo` constraints.
     
 - Either Or  
-    The generator will only select puzzles which have no more than this number of `EitherOr` constraints.
+    The generator will prefer puzzles which have no more than this number of `EitherOr` constraints.
 
 Leave these settings blank if you do not care to enforce any particular maximum.
 
-## Interpreting the Output
+## Results
 
-[Sample Output](Files/SampleOutput.txt)
+The final result of the generation process is a *Generation Analysis Report* containing all information about that puzzle - the constraints, an analysis of the strategies required, the selected generation settings, the solution, and a step-by-step guide of how to solve the puzzle. If the process is still ongoing, only a partial report will be printed.
+
+[Sample Report](Files/SampleReport.txt)
 
 #### Satisfied vs. Unsatisfied
 
-The first line of output will say either `[Satisfied]` or `[Unsatisfied]`. This refers to whether or not the puzzle described below satisfies all of the desired restrictions - the minimum/maximum number of applications for each enabled strategy and the maximum constraint counts. Once a puzzle is found that satisfies all restrictions, *LogikGen* no longer select puzzles that do not satisfy them. 
+Within the top few lines of the report will be the message `All Targets Satisfied` or `Some Targets Unsatisfied`. 
+
+    Report Generated 10:21:35 AM
+    All Targets Satisfied
+    Search Complete!
+
+This refers to whether or not the puzzle described satisfies all of the desired targets - namely, the minimum/maximum number of applications for each enabled strategy and the maximum constraint counts. Once a puzzle is found that satisfies all targets, *LogikGen* will no longer select puzzles that do not satisfy them. 
 
 #### Constraints
 
-Next we're given the list of constraints for the newly generated puzzle. In our sample output we have:
+Next we're given the list of the constraints for the newly generated puzzle. In our sample output we have:
+
+    +--------------------------------------------------------------+
+    |                         Constraints                          |
+    +--------------------------------------------------------------+
 
     6 total constraints.
-    LessThan:Location(Blue, Norwegian)
-    NextTo:Location(Spaniard, Red)
-    Identity(Red, 2nd, Zebra, Norwegian)
-    EitherOr(Englishman, Fox, Red)
-    NextTo:Location(Norwegian, Blue)
-    LessThan:Location(Green, Snails)
+
+    EitherOr(Fox, 4th, Green)
+    EitherOr(Snails, Englishman, Yellow)
+    Equal(Blue, 3rd)
+    Identity(Dog, Spaniard, Blue, 4th)
+    LessThan:Location(Red, Ukrainian)
+    NextTo:Location(Green, Ukrainian)
+
 
 These can be written in plain English as:
 
-1. The blue house is located somewhere to the left of the Norwegian.  
-    `LessThan:Location(Blue, Norwegian)`
+1. The fox owner lives either in the 4th house, or in the green house.  
+    `EitherOr(Fox, 4th, Green)`
     
-2. The Spaniard lives next to the red house.  
-    `NextTo:Location(Spaniard, Red)`
+2. Snails are kept either by the Englishman, or by the owner of the yellow house.  
+    `EitherOr(Snails, Englishman, Yellow)`
     
-3. The four people are: the man who lives in the red house, the man who lives in the 2nd house, the man who keeps the zebra, and the Norwegian.  
-    `Identity(Red, 2nd, Zebra, Norwegian)`
+3. The blue house is the 3rd one from the left.  
+    `Equal(Blue, 3rd)`
     
-4. The Englishman either keeps the fox, or lives in the red house.  
-    `EitherOr(Englishman, Fox, Red)`
+4. The four people are: the dog owner, the Spaniard, the owner of the blue house, and the owner of the 4th house.  
+    `Identity(Dog, Spaniard, Blue, 4th)`
     
-5. The Norwegian lives next to the blue house.  
-    `NextTo:Location(Norwegian, Blue)`
+5. The red house is located somewhere to the left of where the Ukrainian lives.  
+    `LessThan:Location(Red, Ukrainian)`
 
-6. The green house is located somewhere to the left of the man who keeps snails.  
-    `LessThan:Location(Green, Snails)`
+6. The green house is located next to where the Ukrainian lives.  
+    `NextTo:Location(Green, Ukrainian)`
 
-#### Minimum Applications
+#### Strategies Required
 
-Next we're given a list of the minimum number of applications needed of each enabled strategy in order to solve the puzzle. This list is a bit misleading though, as described in [The Paradox of Too Many Strategies](Strategies.md#the-paradox-of-too-many-strategies). 
+Next we're given a list of the strategies required in order to solve the puzzle, along with the minimum number of times each strategy must be applied. It's important to note that this list is not exhaustive! As described in [The Paradox of Too Many Strategies](Strategies.md#the-paradox-of-too-many-strategies), if two different strategies can deduce the same information, then neither will be flagged as required even if at least one of them must be used.
 
-Reproduced here are some of the entries of the *Minimum Applications* list shown in the sample.
+    +--------------------------------------------------------------+
+    |                     Strategies Required                      |
+    +--------------------------------------------------------------+
 
-    [BinaryConstraintAnalysisStrategy/Direct: 0]
-    [BinaryConstraintAnalysisStrategy/IndirectBoth: 0]
-    etc...
-    [EitherOrImpliesDistinctStrategy: 1]
-    ...
-    [IdentityConstraintStrategy: 1]
-    ....
-    [NextToCompatibilityCheckStrategy/General: 1]
-    ...
-    [NextToIncompatibilitySearchStrategy/General: 1]
-    ...
-    [PigeonholeStrategy: 0]
-    [PropertyPairAnalysisStrategy: 0]
-    [SynchronizeStrategy: 1]    
+    EitherOrDomainStrategy (Medium)
+    2 application(s) needed.
 
-No matter how you approach this puzzle, you will be required to use, at minimum, the strategies [EitherOr Implies Distinct](Strategies/DistinctEquivalent.md), [Identity Constraint](Strategies/BasicAssertions.md#identity-constraint-strategy), The general variant of [NextTo Compatibility Check](Strategies/NextToCompatibilityCheckStrategy.md), the general variant of [NextTo Incompatibility Search](Strategies/NextToIncompatibilitySearchStrategy.md), and [Synchronize](Strategies/SynchronizeStrategy.md).
+    EitherOrImpliesDistinctStrategy (Easy)
+    1 application(s) needed.
 
-#### Solution
+    EqualConstraintStrategy (Easiest)
+    1 application(s) needed.
 
-Next we're given the solution to our puzzle, both as a grid and a solution matrix. Our sample puzzle uses a rather unusually straight forward solution.
+    IdentityConstraintStrategy (Easiest)
+    1 application(s) needed.
 
+    LessThanDomainStrategy (Medium)
+    1 application(s) needed.
 
-              |1234|ESUN|RGBY|DFZS|
-    -------------------------------
-    1st       |O...|O...|O...|O...|
-    2nd       |.O..|.O..|.O..|.O..|
-    3rd       |..O.|..O.|..O.|..O.|
-    4th       |...O|...O|...O|...O|
-    -------------------------------
-    Englishman|O...|O...|O...|O...|
-    Spaniard  |.O..|.O..|.O..|.O..|
-    Ukrainian |..O.|..O.|..O.|..O.|
-    Norwegian |...O|...O|...O|...O|
-    -------------------------------
-    Red       |O...|O...|O...|O...|
-    Green     |.O..|.O..|.O..|.O..|
-    Blue      |..O.|..O.|..O.|..O.|
-    Yellow    |...O|...O|...O|...O|
-    -------------------------------
-    Dog       |O...|O...|O...|O...|
-    Fox       |.O..|.O..|.O..|.O..|
-    Zebra     |..O.|..O.|..O.|..O.|
-    Snails    |...O|...O|...O|...O|
-    -------------------------------
+    LessThanImpliesDistinctStrategy (Easy)
+    1 application(s) needed.
 
+    NextToDomainStrategy (Medium)
+    2 application(s) needed.
 
-    -----------------------------------------------------
-    |    1st     |    2nd     |    3rd     |    4th     |
-    | Englishman |  Spaniard  | Ukrainian  | Norwegian  |
-    |    Red     |   Green    |    Blue    |   Yellow   |
-    |    Dog     |    Fox     |   Zebra    |   Snails   |
-    -----------------------------------------------------
+    NextToImpliesDistinctStrategy (Easy)
+    1 application(s) needed.
 
-#### Deduction Log
+    SynchronizeStrategy (Easy)
+    3 application(s) needed.
 
-Finally, we're given a log detailing which strategies can be applied in which order to arrive at the solution, including the state of the grid after every step.
+#### Categories & Properties, Constraint Targets, Enabled Strategies, Solution
 
-## Suggested Settings
+These sections are mostly self-explanatory and merely list the selected generation settings and the solution of the puzzle.
 
-For a good fun puzzle that's moderately challenging but not too crazy, try the following settings:
+#### How To Solve
 
-- Number of Categories: 4
-- Category Size: 4
-- One ordered category. 
+There are many ways to solve a given *Zebra* puzzle. Different people will employ different strategies at different times. This section merley shows one possible approach to arriving at the solution, using only those strategies which were enabled.
 
-The built-in sample data is an excellent place to start. Bigger puzzles slow the generator substantially. 
+## "Unsolvable" Results
 
-- Randomize the solution.
+If the `Unsolvable` box was checked, a different kind of generation analysis report is printed.
 
-- Disable all `Binary Constraint Analysis` variants.  
-    This is a rather weird strategy and probably not ideal to start with.
+[Sample 'Unsolvable' Report](Files/SampleUnsolvableReport.txt)
 
-- Disable all strategies within the `Constraint Generation` and `Compatibility Check` sections.  
-    These, too, tend to be trickier to apply than most Zebra puzzles call for.
+Any chosen generation targets - such as the constraint counts or the desired number of applications for each enabled strategy - are ignored. 
 
-- Pigenhole Strategy - Min: 0, Max: 1.  
-    This is a time-consuming strategy to recognize and apply, so you wouldn't want it to be required more than once. 
+The purpose of the Unsolvable setting is purely to explore new strategies. It generates puzzles that are guaranteed to have a unique solution, but for which no enabled strategy can solve. This is how many of *LogikGen's* crazier strategies were discovered. 
 
-- Property Pair Analysis Strategy - Min: 2, Max: none (blank).  
-    The puzzles you find in books tend to require this strategy pretty heavily. 
-    
-- Maximum Constraint Counts. These settings will ensure a decent variety without there being too many clues in total.  
-    - Total: 8
-    - Equal: 0
-    - Distinct: 3
-    - Identity: 1
-    - Less Than: 3
-    - Next To: 3
-    - Either Or: 2
+In addition to the list of constraints, the solution, and the enabled strategies, a "partial solution" is also printed. This is a grid showing all information that the enabled strategies were able to deduce. From here, you're on your own. 
 
-Let the generator run until it says all requirements have been `[Satisfied]`, after which you can click `Cancel`. This could require searching through as many as 20,000 puzzles, but on a reasonably fast desktop PC even that should take less than a minute. 
-
-Save the output to a text file and enjoy your new puzzle. 
+If you decide to tackle such puzzles, be forewarned that a lengthy brute-force "guess and check" approach will very likely be required.
 
 ---
 

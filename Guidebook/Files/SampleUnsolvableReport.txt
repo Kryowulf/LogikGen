@@ -1,0 +1,118 @@
+Unsolvable Puzzle Generated 11:32:38 PM
+
++--------------------------------------------------------------+
+|                         Constraints                          |
++--------------------------------------------------------------+
+
+5 total constraints.
+
+Identity(Dog, 2nd, Blue, Norwegian)
+Identity(Englishman, Green, 3rd, Snails)
+NextTo:Location(Spaniard, Dog)
+EitherOr(Ukrainian, 4th, Zebra)
+Identity(Red, 2nd, Ukrainian, Snails)
+
++--------------------------------------------------------------+
+|                       Partial Solution                       |
++--------------------------------------------------------------+
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...| .  |    |    |
+2nd       |.O..|  ..|. . |.  .|
+3rd       |..O.|.   | .  |   .|
+4th       |...O|    |    |  . |
+-------------------------------
+Englishman|  . |O...| .  |   .|
+Spaniard  |.   |.O..|    |.   |
+Ukrainian | .  |..O.|.   |   .|
+Norwegian | .  |...O|  . |.   |
+-------------------------------
+Red       | .  |  . |O...|   .|
+Green     |  . |.   |.O..|   .|
+Blue      | .  |   .|..O.|.   |
+Yellow    |    |    |...O|    |
+-------------------------------
+Dog       | .  | . .|  . |O...|
+Fox       |    |    |    |.O..|
+Zebra     |   .|    |    |..O.|
+Snails    | .. |. . |..  |...O|
+-------------------------------
+
+
++--------------------------------------------------------------+
+|                      Complete Solution                       |
++--------------------------------------------------------------+
+
+          |1234|ESUN|RGBY|DFZS|
+-------------------------------
+1st       |O...|O...|O...|O...|
+2nd       |.O..|.O..|.O..|.O..|
+3rd       |..O.|..O.|..O.|..O.|
+4th       |...O|...O|...O|...O|
+-------------------------------
+Englishman|O...|O...|O...|O...|
+Spaniard  |.O..|.O..|.O..|.O..|
+Ukrainian |..O.|..O.|..O.|..O.|
+Norwegian |...O|...O|...O|...O|
+-------------------------------
+Red       |O...|O...|O...|O...|
+Green     |.O..|.O..|.O..|.O..|
+Blue      |..O.|..O.|..O.|..O.|
+Yellow    |...O|...O|...O|...O|
+-------------------------------
+Dog       |O...|O...|O...|O...|
+Fox       |.O..|.O..|.O..|.O..|
+Zebra     |..O.|..O.|..O.|..O.|
+Snails    |...O|...O|...O|...O|
+-------------------------------
+
+
++--------------------------------------------------------------+
+|                      Enabled Strategies                      |
++--------------------------------------------------------------+
+
+BinaryConstraintAnalysisStrategy/Direct
+BinaryConstraintAnalysisStrategy/IndirectBoth
+BinaryConstraintAnalysisStrategy/IndirectDistinctOnly
+BinaryConstraintAnalysisStrategy/IndirectEqualOnly
+BlockCrossoutStrategy
+DistinctConstraintStrategy
+DoubleNextToImpliesBetweenStrategy/Direct
+DoubleNextToImpliesBetweenStrategy/IndirectBoth
+DoubleNextToImpliesBetweenStrategy/IndirectDistinctOnly
+DoubleNextToImpliesBetweenStrategy/IndirectEqualOnly
+DoubleNextToImpliesEqualStrategy/Direct
+DoubleNextToImpliesEqualStrategy/IndirectEqualOnly
+EitherOrArgumentUnionStrategy
+EitherOrDomainStrategy
+EitherOrImpliesDistinctStrategy
+EitherOrTransitiveConstraintGenerationStrategy/Direct
+EitherOrTransitiveConstraintGenerationStrategy/IndirectBoth
+EitherOrTransitiveConstraintGenerationStrategy/IndirectDistinctOnly
+EitherOrTransitiveConstraintGenerationStrategy/IndirectEqualOnly
+EqualConstraintStrategy
+IdentityConstraintStrategy
+ImmediateLessThanCompatibilityCheckStrategy/General
+ImmediateLessThanCompatibilityCheckStrategy/SameCategory
+LessThanDomainStrategy
+LessThanImpliesDistinctStrategy
+LessThanManyCompatibilityCheckStrategy/General
+LessThanManyCompatibilityCheckStrategy/SameCategory
+LessThanManyDomainStrategy/Direct
+LessThanManyDomainStrategy/IndirectBoth
+LessThanManyDomainStrategy/IndirectDistinctOnly
+LessThanManyDomainStrategy/IndirectEqualOnly
+LessThanNextToTransitiveConstraintGenerationStrategy/Direct
+LessThanNextToTransitiveConstraintGenerationStrategy/IndirectEqualOnly
+LessThanTransitiveConstraintGenerationStrategy/Direct
+LessThanTransitiveConstraintGenerationStrategy/IndirectEqualOnly
+NextToCompatibilityCheckStrategy/General
+NextToCompatibilityCheckStrategy/SameCategory
+NextToDomainStrategy
+NextToImpliesDistinctStrategy
+NextToIncompatibilitySearchStrategy/General
+NextToIncompatibilitySearchStrategy/SameCategory
+PigeonholeStrategy
+PropertyPairAnalysisStrategy
+SynchronizeStrategy
